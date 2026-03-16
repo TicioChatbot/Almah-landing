@@ -9,7 +9,7 @@ import './index.css'
 
 function App() {
   return (
-    <Router>
+    <Router basename="/Almah-landing">
       <div className="app-wrapper">
         <Navbar />
         <Routes>
