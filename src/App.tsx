@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import DetailedFooter from './components/DetailedFooter'
 import HomePage from './pages/HomePage'
@@ -9,7 +9,7 @@ import './index.css'
 
 function App() {
   return (
-    <Router basename="/Almah-landing">
+    <Router>
       <div className="app-wrapper">
         <Navbar />
         <Routes>
