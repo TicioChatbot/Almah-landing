@@ -1,6 +1,6 @@
 
 
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-high.png';
 
 const Footer = () => {
   return (
@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem' }}>
           <div>
-            <img src={logo} alt="Almah Logo" style={{ height: '48px', width: 'auto', marginBottom: '1.5rem' }} />
+            <img src={logo} alt="Almah Logo" style={{ height: '60px', width: 'auto', marginBottom: '1.5rem' }} />
             <p style={{ opacity: 0.6 }}>La red profesional definitiva para abogados líderes en su especialidad.</p>
           </div>
           <div>
@@ -21,8 +21,8 @@ const Footer = () => {
           </div>
           <div>
             <h4 style={{ marginBottom: '1.5rem' }}>Contacto</h4>
-            <p style={{ opacity: 0.8 }}>info@almah.legal</p>
-            <p style={{ opacity: 0.8 }}>+57 321 456 7890</p>
+            <p style={{ opacity: 0.8 }}>Almah@redek.co</p>
+            <p style={{ opacity: 0.8 }}>+57 300 000 0000</p>
           </div>
           <div>
             <h4 style={{ marginBottom: '1.5rem' }}>Síguenos</h4>

@@ -1,6 +1,6 @@
 
 
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-high.png';
 
 const DetailedFooter = () => {
   return (
@@ -9,7 +9,7 @@ const DetailedFooter = () => {
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '4rem', marginBottom: '4rem' }}>
           {/* Logo & Info */}
           <div>
-            <img src={logo} alt="Almah Logo" style={{ height: '56px', width: 'auto', marginBottom: '1.5rem' }} />
+            <img src={logo} alt="Almah Logo" style={{ height: '70px', width: 'auto', marginBottom: '1.5rem' }} />
             <p style={{ color: '#A0A0A0', lineHeight: '1.6', fontSize: '16px' }}>
               Redefiniendo la experiencia jurídica mediante networking, formación e inteligencia artificial avanzada.
             </p>
@@ -30,7 +30,7 @@ const DetailedFooter = () => {
           <div>
             <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '1.5rem' }}>Contacto</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '16px', color: '#A0A0A0' }}>
-              <span>hola@almah.com</span>
+              <span>Almah@redek.co</span>
               <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>LinkedIn</a>
               <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Instagram</a>
             </div>

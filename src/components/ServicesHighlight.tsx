@@ -1,4 +1,4 @@
-import servicesPreviewImg from '../assets/services-preview.png';
+import heroVideo from '../assets/hero-video.mp4';
 
 const ServicesHighlight = () => {
   const services = [
@@ -17,7 +17,7 @@ const ServicesHighlight = () => {
           gridTemplateColumns: 'repeat(4, 1fr)', 
           gap: '1rem', 
           textAlign: 'center',
-          marginBottom: '40px'
+          marginBottom: '40px' 
         }}>
           {services.map((service, i) => (
             <div key={i} style={{ padding: '0 10px' }}>
@@ -35,22 +35,27 @@ const ServicesHighlight = () => {
           ))}
         </div>
         
-        {/* Main UI Placeholder Box */}
+        {/* Main Banner Video */}
         <div style={{ 
           width: '100%', 
-          backgroundColor: '#D9D9F2', 
+          backgroundColor: '#000', 
           border: '12px solid rgba(255, 255, 255, 0.3)', 
-          borderRadius: '4px',
+          borderRadius: '12px',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
         }}>
-          <img 
-            src={servicesPreviewImg} 
-            alt="Interfaz de servicios" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          >
+            <source src={heroVideo} type="video/mp4" />
+          </video>
         </div>
       </div>
     </section>

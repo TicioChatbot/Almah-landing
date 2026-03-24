@@ -1,5 +1,7 @@
-
 const ContactSection = () => {
+  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfuF29k2z6R2X-qU0YI6j-9-Xy-X-X-X-X/viewform"; // Placeholder
+
+
   return (
     <section id="contacto" style={{ backgroundColor: 'var(--off-white)', padding: 'var(--section-padding)' }}>
       <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem' }}>
@@ -20,34 +22,44 @@ const ContactSection = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
               <div style={{ fontWeight: 700, fontSize: '18px', color: 'var(--lilac)', marginBottom: '0.5rem' }}>Email</div>
-              <div style={{ fontSize: '18px' }}>hola@almah.com</div>
+              <div style={{ fontSize: '18px' }}>Almah@redek.co</div>
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '18px', color: 'var(--lilac)', marginBottom: '0.5rem' }}>Ubicación</div>
-              <div style={{ fontSize: '18px' }}>Ciudad de México, México</div>
+              <div style={{ fontSize: '18px' }}>Bogotá, Colombia</div>
             </div>
           </div>
         </div>
 
-        {/* Right Column - Form */}
-        <div style={{ backgroundColor: 'var(--white)', padding: '3rem', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <input type="text" placeholder="Nombre completo" style={{ padding: '1rem', borderRadius: '4px', border: '1px solid #D1D5DB', fontSize: '16px' }} />
-            <input type="email" placeholder="Correo electrónico" style={{ padding: '1rem', borderRadius: '4px', border: '1px solid #D1D5DB', fontSize: '16px' }} />
-            <textarea placeholder="¿En qué podemos ayudarte?" rows={4} style={{ padding: '1rem', borderRadius: '4px', border: '1px solid #D1D5DB', fontSize: '16px', resize: 'none' }}></textarea>
-            <button type="submit" style={{ 
-              backgroundColor: 'var(--button-indigo)', 
-              color: 'var(--white)', 
-              padding: '1rem', 
-              borderRadius: '6px', 
-              border: 'none', 
+        {/* Right Column - CTA Button */}
+        <div style={{ 
+          backgroundColor: 'var(--white)', 
+          padding: '4rem 3rem', 
+          borderRadius: '12px', 
+          border: '1px solid #E5E7EB',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+        }}>
+          <h3 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '1.5rem' }}>Hablemos de tu proyecto</h3>
+          <p style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '2.5rem' }}>
+            Completa nuestro formulario rápido y nos pondremos en contacto contigo.
+          </p>
+          <button 
+            onClick={() => window.open(googleFormUrl, '_blank')}
+            className="btn-primary" 
+            style={{ 
+              padding: '1.25rem 3rem', 
               fontSize: '18px', 
-              fontWeight: 700,
-              cursor: 'pointer'
-            }}>
-              Enviar mensaje
-            </button>
-          </form>
+              width: '100%',
+              maxWidth: '300px'
+            }}
+          >
+            Ir al formulario
+          </button>
         </div>
       </div>
     </section>

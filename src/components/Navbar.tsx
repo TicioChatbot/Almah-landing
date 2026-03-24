@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-high.png';
 
 const Navbar = () => {
   return (
@@ -29,7 +29,7 @@ const Navbar = () => {
       }}>
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <img src={logo} alt="Almah Logo" style={{ height: '56px', width: 'auto' }} />
+          <img src={logo} alt="Almah Logo" style={{ height: '70px', width: 'auto' }} />
         </Link>
         
         {/* Navigation Links */}

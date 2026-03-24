@@ -53,15 +53,25 @@ const ServicesAlternatingList = () => {
               {/* Image Side */}
               <div style={{ 
                 flex: 1.2, 
-                backgroundColor: '#D1D5DB', 
                 aspectRatio: '16/10', 
-                borderRadius: '4px',
-                overflow: 'hidden'
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.05)',
+                backgroundColor: '#F9FAFB', // Light gray background to fill empty space
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <img 
                   src={item.image} 
                   alt={item.title} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ 
+                    maxWidth: i === 1 ? '90%' : '100%', // Slight padding for the repository UI
+                    maxHeight: '90%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain' 
+                  }}
                 />
               </div>
             </div>

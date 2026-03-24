@@ -13,7 +13,7 @@ const AboutHistory = () => {
         </h2>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <p style={{ fontSize: '20px', color: '#4B5563', lineHeight: '1.6' }}>
-            Founded by a group of passionate entrepreneurs, our company has grown from a small startup into a leading provider of innovative solutions for businesses across a wide range of industries.
+            Fundada por un grupo de emprendedores apasionados, nuestra empresa ha crecido de ser una pequeña startup a convertirse en un proveedor líder de soluciones innovadoras para profesionales en diversas industrias.
           </p>
         </div>
       </div>

@@ -115,14 +115,34 @@ section {
 button {
   cursor: pointer;
   border: none;
-  background: var(--secondary);
-  color: white;
+  background: var(--lavender);
+  color: var(--text-primary);
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: background 0.2s;
+  border-radius: 100px;
+  font-weight: 700;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+  background-color: var(--mint-green);
+  color: var(--text-deep-green);
+}
+
+.btn-primary:hover {
+  background-color: #00c785;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--white);
+  border: 2px solid var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }

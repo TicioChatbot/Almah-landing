@@ -1,10 +1,12 @@
-import communityPrivacyImg from '../assets/community-privacy.png';
-import communityFintechImg from '../assets/community-fintech.png';
+import communityPrivacyImg from '../assets/community-privacy-new.jpg';
+import communityFintechImg from '../assets/community-fintech-new.jpg';
+import logoHub from '../assets/logo-hub.png';
+import logoRcm from '../assets/logo-rcm.png';
 
 const CommunitiesGrid = () => {
   return (
     <section id="comunidades" style={{ backgroundColor: 'var(--white)', position: 'relative' }}>
-      <div className="container">
+      <div className="container" style={{ paddingBottom: '80px' }}>
         {/* Decorative Lavender Bar */}
         <div style={{ 
           width: '100%', 
@@ -65,7 +67,7 @@ const CommunitiesGrid = () => {
               <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                 Hub de Privacidad
               </h3>
-              <div style={{ fontWeight: 800, fontSize: '18px', color: '#1A1A1A' }}>hub <span style={{ fontWeight: 400, fontSize: '12px' }}>de Privacidad</span></div>
+              <img src={logoHub} alt="Hub Logo" style={{ height: '40px', width: 'auto' }} />
             </div>
             
             <p style={{ fontSize: '20px', color: '#374151', lineHeight: '24px', fontWeight: 400 }}>
@@ -100,7 +102,7 @@ const CommunitiesGrid = () => {
               <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                 Fintech School
               </h3>
-              <div style={{ fontWeight: 800, fontSize: '14px', color: '#1A1A1A' }}>RC&M <span style={{ fontWeight: 400, fontSize: '10px' }}>ABOGADOS</span></div>
+              <img src={logoRcm} alt="RC&M Logo" style={{ height: '40px', width: 'auto' }} />
             </div>
 
             <p style={{ fontSize: '20px', color: '#1F1F1F', lineHeight: '24px', fontWeight: 400 }}>
