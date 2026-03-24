@@ -1,5 +1,5 @@
 const ContactSection = () => {
-  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfuF29k2z6R2X-qU0YI6j-9-Xy-X-X-X-X/viewform"; // Placeholder
+  const googleFormUrl = "https://forms.gle/BP7mZF9xze6FAkB46";
 
 
   return (
