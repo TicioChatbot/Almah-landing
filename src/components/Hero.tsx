@@ -10,8 +10,18 @@ const Hero = () => {
           Una comunidad de abogados para abogados donde puedes compartir tu conocimiento y experiencias y aprender junto a colegas de tu área.
         </p>
         <div className="animate-fade-in delay-2" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '3rem' }}>
-          <button style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Explorar Comunidades</button>
-          <button style={{ padding: '1rem 2rem', fontSize: '1.1rem', backgroundColor: 'transparent', color: 'var(--text-primary)', border: '2px solid var(--text-primary)' }}>Ver más</button>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
+          >
+            Explorar Comunidades
+          </button>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            style={{ padding: '1rem 2rem', fontSize: '1.1rem', backgroundColor: 'transparent', color: 'var(--text-primary)', border: '2px solid var(--text-primary)' }}
+          >
+            Ver más
+          </button>
         </div>
       </div>
     </section>

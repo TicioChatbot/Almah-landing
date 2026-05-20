@@ -21,16 +21,19 @@ const ValueProp = () => {
         }}>
           Una comunidad de abogados para abogados donde puedes compartir tu conocimiento y experiencias y aprender junto a colegas de tu área.
         </p>
-        <button style={{ 
-          backgroundColor: '#65628C', 
-          color: 'var(--white)',
-          padding: '0.75rem 2.5rem',
-          fontSize: '24px',
-          fontWeight: 700,
-          borderRadius: '100px', // Pill shape from screenshot
-          border: 'none',
-          cursor: 'pointer'
-        }}>
+        <button 
+          onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+          style={{ 
+            backgroundColor: '#65628C', 
+            color: 'var(--white)',
+            padding: '0.75rem 2.5rem',
+            fontSize: '24px',
+            fontWeight: 700,
+            borderRadius: '100px', // Pill shape from screenshot
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
           Únete a Almah
         </button>
       </div>

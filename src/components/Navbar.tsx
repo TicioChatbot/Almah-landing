@@ -48,20 +48,23 @@ const Navbar = () => {
 
         {/* Auth Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <a href="#" style={{ color: 'var(--white)', fontWeight: 700, textDecoration: 'none', fontSize: 'var(--font-size-nav)' }}>Iniciar sesión</a>
+          <a href="https://fintech.almah.ai" style={{ color: 'var(--white)', fontWeight: 700, textDecoration: 'none', fontSize: 'var(--font-size-nav)' }}>Iniciar sesión</a>
           
-          <button style={{ 
-            backgroundColor: 'var(--white)', 
-            color: 'var(--text-black)',
-            padding: '0.65rem 1.8rem',
-            fontSize: 'var(--font-size-nav)',
-            borderRadius: '100px',
-            border: 'none',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            transition: 'transform 0.2s ease'
-          }}>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            style={{ 
+              backgroundColor: 'var(--white)', 
+              color: 'var(--text-black)',
+              padding: '0.65rem 1.8rem',
+              fontSize: 'var(--font-size-nav)',
+              borderRadius: '100px',
+              border: 'none',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              transition: 'transform 0.2s ease'
+            }}
+          >
             Registrarse
           </button>
         </div>

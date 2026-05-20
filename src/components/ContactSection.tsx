@@ -1,5 +1,5 @@
 const ContactSection = () => {
-  const googleFormUrl = "https://forms.gle/BP7mZF9xze6FAkB46";
+  const googleFormUrl = "https://forms.gle/EgnBCy7TNZ3rSksdA";
 
 
   return (

@@ -24,11 +24,16 @@ const ServicesBottomCTA = () => {
           <p style={{ fontSize: '18px', color: 'var(--white)', marginBottom: '3rem', opacity: 0.9 }}>
             En Almah te ofrecemos una red de apoyo y herramientas para que <br /> tú y tu equipo se conviertan en aliados estratégicos.
           </p>
-          <button className="btn-secondary" style={{ 
-            padding: '1rem 3rem',
-            fontSize: '20px',
-            width: 'auto'
-          }}>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            className="btn-secondary" 
+            style={{ 
+              padding: '1rem 3rem',
+              fontSize: '20px',
+              width: 'auto',
+              cursor: 'pointer'
+            }}
+          >
             Únete a Almah
           </button>
         </div>

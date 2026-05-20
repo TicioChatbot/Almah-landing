@@ -35,14 +35,18 @@ const TeamSection = () => {
           <h2 style={{ fontSize: '44px', color: 'var(--white)', marginBottom: '2rem' }}>
             Lleva tu carrera al siguiente nivel rodeado de quienes entienden tu mundo.
           </h2>
-          <button style={{ 
-            backgroundColor: 'var(--white)', 
-            color: 'var(--button-indigo)',
-            padding: '1rem 2.5rem',
-            fontSize: '24px',
-            borderRadius: '8px',
-            fontWeight: 700
-          }}>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            style={{ 
+              backgroundColor: 'var(--white)', 
+              color: 'var(--button-indigo)',
+              padding: '1rem 2.5rem',
+              fontSize: '24px',
+              borderRadius: '8px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
             Únete a Almah
           </button>
         </div>

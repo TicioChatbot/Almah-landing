@@ -41,13 +41,18 @@ const CommunitiesGrid = () => {
           marginTop: '-120px' // Overlap effect
         }}>
           {/* Hub de Privacidad */}
-          <div className="premium-card" style={{ 
-            padding: '2rem', 
-            border: '4px solid rgba(26, 26, 26, 0.1)', 
-            backgroundColor: 'var(--white)',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-          }}>
+          <div 
+            className="premium-card" 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            style={{ 
+              padding: '2rem', 
+              border: '4px solid rgba(26, 26, 26, 0.1)', 
+              backgroundColor: 'var(--white)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+              cursor: 'pointer'
+            }}
+          >
             <div style={{ 
               width: '100%', 
               aspectRatio: '16/9', 
@@ -76,13 +81,18 @@ const CommunitiesGrid = () => {
           </div>
 
           {/* Fintech School */}
-          <div className="premium-card" style={{ 
-            padding: '2rem', 
-            border: '4px solid rgba(26, 26, 26, 0.1)', 
-            backgroundColor: 'var(--white)',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-          }}>
+          <div 
+            className="premium-card" 
+            onClick={() => window.location.href = 'https://fintech.almah.ai'}
+            style={{ 
+              padding: '2rem', 
+              border: '4px solid rgba(26, 26, 26, 0.1)', 
+              backgroundColor: 'var(--white)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+              cursor: 'pointer'
+            }}
+          >
             <div style={{ 
               width: '100%', 
               aspectRatio: '16/9', 

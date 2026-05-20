@@ -14,13 +14,23 @@ const HeroHeader = () => {
           Networking, formación e inteligencia artificial en una plataforma integral creada para profesionales en crecimiento
         </h1>
         <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '3rem' }}>
-          <button className="btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}>Explorar Comunidades</button>
-          <button className="btn-secondary" style={{ 
-            padding: '1rem 2.5rem', 
-            fontSize: '1.1rem',
-            color: 'var(--text-black)',
-            borderColor: 'var(--text-black)' 
-          }}>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            className="btn-primary" 
+            style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}
+          >
+            Explorar Comunidades
+          </button>
+          <button 
+            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            className="btn-secondary" 
+            style={{ 
+              padding: '1rem 2.5rem', 
+              fontSize: '1.1rem',
+              color: 'var(--text-black)',
+              borderColor: 'var(--text-black)' 
+            }}
+          >
             Ver más
           </button>
         </div>

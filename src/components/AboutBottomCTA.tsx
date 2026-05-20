@@ -21,16 +21,19 @@ const AboutBottomCTA = () => {
         }}>
           Conecta, comparte y aprende con profesionales de tu misma especialidad
         </p>
-        <button style={{ 
-          backgroundColor: '#65628C', 
-          color: 'var(--white)',
-          padding: '0.75rem 3rem',
-          fontSize: '20px',
-          fontWeight: 700,
-          borderRadius: '100px',
-          border: 'none',
-          cursor: 'pointer'
-        }}>
+        <button 
+          onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+          style={{ 
+            backgroundColor: '#65628C', 
+            color: 'var(--white)',
+            padding: '0.75rem 3rem',
+            fontSize: '20px',
+            fontWeight: 700,
+            borderRadius: '100px',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
           Únete a Almah
         </button>
       </div>

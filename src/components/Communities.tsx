@@ -23,7 +23,17 @@ const Communities = () => {
           <div key={index} className="premium-card">
             <h3 style={{ marginBottom: '1rem', color: 'var(--secondary)' }}>{comm.title}</h3>
             <p style={{ color: 'var(--text-secondary)' }}>{comm.description}</p>
-            <button style={{ marginTop: '1.5rem', backgroundColor: 'transparent', color: 'var(--secondary)', border: '1px solid var(--secondary)', width: '100%' }}>
+            <button 
+              onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+              style={{ 
+                marginTop: '1.5rem', 
+                backgroundColor: 'transparent', 
+                color: 'var(--secondary)', 
+                border: '1px solid var(--secondary)', 
+                width: '100%',
+                cursor: 'pointer'
+              }}
+            >
               Saber más
             </button>
           </div>

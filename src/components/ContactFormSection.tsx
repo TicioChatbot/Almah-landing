@@ -6,7 +6,7 @@ import image3 from '../assets/service-3.jpg';
 const ContactFormSection = () => {
   const images = [image1, image2, image3];
   const [currentIdx, setCurrentIdx] = useState(0);
-  const googleFormUrl = "https://forms.gle/BP7mZF9xze6FAkB46";
+  const googleFormUrl = "https://forms.gle/EgnBCy7TNZ3rSksdA";
 
   useEffect(() => {
     const timer = setInterval(() => {

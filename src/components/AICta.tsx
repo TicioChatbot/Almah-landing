@@ -25,16 +25,19 @@ const AICta = () => {
           Nuestro blog es una brújula diseñada para abogados que, como tú, le ponen el almah en su trabajo.
         </p>
 
-        <button style={{ 
-          backgroundColor: '#65628C',
-          color: 'var(--white)',
-          padding: '0.75rem 2.5rem',
-          fontSize: '18px',
-          fontWeight: 700,
-          borderRadius: '100px',
-          border: 'none',
-          cursor: 'pointer'
-        }}>
+        <button 
+          onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+          style={{ 
+            backgroundColor: '#65628C',
+            color: 'var(--white)',
+            padding: '0.75rem 2.5rem',
+            fontSize: '18px',
+            fontWeight: 700,
+            borderRadius: '100px',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
           Explora el blog
         </button>
       </div>
