@@ -27,9 +27,8 @@ const Footer = () => {
           <div>
             <h4 style={{ marginBottom: '1.5rem' }}>Síguenos</h4>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <span style={{ opacity: 0.6 }}>LinkedIn</span>
-              <span style={{ opacity: 0.6 }}>Instagram</span>
-              <span style={{ opacity: 0.6 }}>Twitter</span>
+              <a href="https://www.linkedin.com/company/almahcol/?viewAsMember=true" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>LinkedIn</a>
+              <a href="https://www.instagram.com/almah_col/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Instagram</a>
             </div>
           </div>
         </div>

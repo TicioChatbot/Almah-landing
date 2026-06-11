@@ -31,8 +31,8 @@ const DetailedFooter = () => {
             <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '1.5rem' }}>Contacto</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '16px', color: '#A0A0A0' }}>
               <span>Almah@redek.co</span>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>LinkedIn</a>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Instagram</a>
+              <a href="https://www.linkedin.com/company/almahcol/?viewAsMember=true" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>LinkedIn</a>
+              <a href="https://www.instagram.com/almah_col/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Instagram</a>
             </div>
           </div>
 
