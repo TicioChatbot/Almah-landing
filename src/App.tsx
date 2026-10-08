@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
+import PricingPage from './pages/PricingPage'
 import './index.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/servicios" element={<ServicesPage />} />
           <Route path="/sobre-nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
+          <Route path="/precios" element={<PricingPage />} />
         </Routes>
         <DetailedFooter />
       </div>

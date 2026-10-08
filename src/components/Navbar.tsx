@@ -43,6 +43,7 @@ const Navbar = () => {
           <Link to="/" style={{ color: 'var(--white)', textDecoration: 'none' }}>Home</Link>
           <Link to="/servicios" style={{ color: 'var(--white)', textDecoration: 'none' }}>Servicios</Link>
           <Link to="/sobre-nosotros" style={{ color: 'var(--white)', textDecoration: 'none' }}>Sobre nosotros</Link>
+          <Link to="/precios" style={{ color: 'var(--white)', textDecoration: 'none' }}>Precios</Link>
           <Link to="/contacto" style={{ color: 'var(--white)', textDecoration: 'none' }}>Contacto</Link>
         </nav>
 
