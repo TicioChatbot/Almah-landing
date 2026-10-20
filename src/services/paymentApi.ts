@@ -102,6 +102,7 @@ export interface WompiVerifyResponse {
   amount_in_cents: number;
   wompi_status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR';
   async_payment_url?: string | null;
+  status_message?: string | null;
 }
 
 export interface FinancialInstitution {
@@ -128,10 +129,32 @@ function extractErrorMessage(errBody: unknown, status: number): string {
   }
   const body = errBody as Record<string, unknown>;
   if (typeof body.detail === 'string') return body.detail;
+  if (Array.isArray(body.detail)) {
+    const msgs = body.detail
+      .map((item) => {
+        if (item && typeof item === 'object' && 'msg' in item) {
+          const field = Array.isArray((item as { loc?: unknown[] }).loc)
+            ? (item as { loc: unknown[] }).loc.slice(-1)[0]
+            : '';
+          return field ? `${String(field)}: ${String((item as { msg: unknown }).msg)}` : String((item as { msg: unknown }).msg);
+        }
+        return JSON.stringify(item);
+      })
+      .filter(Boolean);
+    if (msgs.length > 0) return msgs.join(', ');
+  }
   if (body.detail && typeof body.detail === 'object') {
     const detailObj = body.detail as Record<string, unknown>;
     if (typeof detailObj.message === 'string') return detailObj.message;
     if (typeof detailObj.detail === 'string') return detailObj.detail;
+    const flatMessages = Object.entries(detailObj)
+      .map(([key, val]) => {
+        if (Array.isArray(val)) return `${key}: ${val.join(', ')}`;
+        if (typeof val === 'string') return `${key}: ${val}`;
+        return null;
+      })
+      .filter(Boolean);
+    if (flatMessages.length > 0) return flatMessages.join(' | ');
     return JSON.stringify(detailObj);
   }
   if (typeof body.message === 'string') return body.message;
@@ -304,8 +327,40 @@ export async function generateWompiTransaction(
 }
 
 /**
+ * Consulta directamente el estado público de una transacción en Wompi (`GET /v1/transactions/{id}`)
+ * Útil para obtener `async_payment_url` (PSE) o `status_message` en tiempo real.
+ */
+export async function fetchWompiTransactionDirect(wompiTransactionId: string): Promise<{
+  status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR';
+  payment_method_type: string;
+  amount_in_cents: number;
+  reference: string;
+  async_payment_url: string | null;
+  status_message: string | null;
+} | null> {
+  try {
+    const wompiUrl = getWompiApiUrl();
+    const res = await fetch(`${wompiUrl}/transactions/${encodeURIComponent(wompiTransactionId)}`);
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json?.data) return null;
+    const tx = json.data;
+    const extra = tx?.payment_method?.extra || {};
+    return {
+      status: tx.status || 'PENDING',
+      payment_method_type: tx.payment_method_type || tx?.payment_method?.type || '',
+      amount_in_cents: tx.amount_in_cents || 0,
+      reference: tx.reference || '',
+      async_payment_url: extra?.async_payment_url || null,
+      status_message: tx.status_message || null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Verifica el estado de una transacción en el backend de Sherlock y activa la suscripción en `profiles` si fue `APPROVED`
- * (`POST /wompi/transactions/verify`)
+ * (`POST /wompi/transactions/verify` con fallback automático a `POST /wompitransactions/verify`)
  */
 export async function verifyWompiTransaction(
   backendUrl: string,
@@ -314,7 +369,7 @@ export async function verifyWompiTransaction(
   reference: string
 ): Promise<WompiVerifyResponse> {
   const baseUrl = backendUrl.replace(/\/$/, '');
-  const res = await fetch(`${baseUrl}/wompi/transactions/verify`, {
+  const reqInit: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -324,11 +379,50 @@ export async function verifyWompiTransaction(
       wompi_transaction_id: wompiTransactionId,
       reference,
     }),
-  });
+  };
+
+  let res = await fetch(`${baseUrl}/wompi/transactions/verify`, reqInit);
+  if (res.status === 404) {
+    res = await fetch(`${baseUrl}/wompitransactions/verify`, reqInit);
+  }
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    // Si el backend aún está esperando que Wompi inicialice `payment_method.extra` (ej. primeros segundos de PSE/Nequi),
+    // consultamos directamente el estado en Wompi para no interrumpir el flujo de redirección o espera.
+    const directTx = await fetchWompiTransactionDirect(wompiTransactionId);
+    if (directTx) {
+      return {
+        status: directTx.status === 'PENDING' ? 'still_pending' : 'processed',
+        reference: directTx.reference || reference,
+        payment_method_type: directTx.payment_method_type,
+        amount_in_cents: directTx.amount_in_cents,
+        wompi_status: directTx.status,
+        async_payment_url: directTx.async_payment_url,
+        status_message: directTx.status_message,
+      };
+    }
     throw new Error(extractErrorMessage(data, res.status));
   }
-  return data as WompiVerifyResponse;
+
+  const result = data as WompiVerifyResponse;
+
+  // Enriquecer con datos directos de Wompi si aún no trae async_payment_url o status_message
+  if (
+    (result.wompi_status === 'PENDING' && !result.async_payment_url) ||
+    result.wompi_status === 'DECLINED' ||
+    result.wompi_status === 'ERROR'
+  ) {
+    const directTx = await fetchWompiTransactionDirect(wompiTransactionId);
+    if (directTx) {
+      if (!result.async_payment_url && directTx.async_payment_url) {
+        result.async_payment_url = directTx.async_payment_url;
+      }
+      if (!result.status_message && directTx.status_message) {
+        result.status_message = directTx.status_message;
+      }
+    }
+  }
+
+  return result;
 }

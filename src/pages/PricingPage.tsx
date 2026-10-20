@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import logoRcm from '../assets/logo-rcm.png';
 import logoHub from '../assets/logo-hub.png';
 import {
@@ -170,6 +170,8 @@ const PricingPage = () => {
 
   // Datos de PSE
   const [pseBanks, setPseBanks] = useState<FinancialInstitution[]>([]);
+  const [pseBanksLoading, setPseBanksLoading] = useState(false);
+  const [pseBanksError, setPseBanksError] = useState<string | null>(null);
   const [pseBankCode, setPseBankCode] = useState('');
   const [pseUserType, setPseUserType] = useState<number>(0); // 0 Natural, 1 Jurídica
   const [pseDocType, setPseDocType] = useState('CC');
@@ -181,20 +183,85 @@ const PricingPage = () => {
   // Estado de Transacción Wompi (Paso 4 y 5)
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPollingBackground, setIsPollingBackground] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('Procesando tu pago con Wompi...');
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [transactionReference, setTransactionReference] = useState<string | null>(null);
   const [transactionStatus, setTransactionStatus] = useState<'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR' | null>(null);
   const [asyncPaymentUrl, setAsyncPaymentUrl] = useState<string | null>(null);
+  const [pseRedirectedOnce, setPseRedirectedOnce] = useState(false);
+  const pollRunIdRef = useRef<number>(0);
 
   const activePrice = billingCycle === 'annual' ? selectedPlan.annualPrice : selectedPlan.monthlyPrice;
   const activePriceInCents = (billingCycle === 'annual' ? selectedPlan.annualPriceNum : selectedPlan.monthlyPriceNum) * 100;
   const subscriptionDuration: 'ANUAL' | 'MENSUAL' = billingCycle === 'annual' ? 'ANUAL' : 'MENSUAL';
   const cycleLabel = billingCycle === 'annual' ? 'Anual' : 'Mensual';
 
-  // Cargar sesión previa (ej. al volver de redirección PSE o confirmación de correo)
+  // Helper para guardar sesión de forma síncrona (clave antes de redirigir a PSE)
+  const persistSessionSync = useCallback(
+    (overrides?: Partial<{
+      instanceId: string;
+      planId: string;
+      billingCycle: 'monthly' | 'annual';
+      email: string;
+      fullName: string;
+      username: string;
+      accessToken: string | null;
+      paymentMethod: 'CARD' | 'PSE' | 'NEQUI';
+      nequiPhone: string;
+      transactionId: string | null;
+      transactionReference: string | null;
+      asyncPaymentUrl: string | null;
+      pseRedirectedOnce: boolean;
+    }>) => {
+      try {
+        const payload = {
+          instanceId: selectedInstance.id,
+          planId: selectedPlan.id,
+          billingCycle,
+          email,
+          fullName,
+          username,
+          accessToken,
+          paymentMethod,
+          nequiPhone,
+          transactionId,
+          transactionReference,
+          asyncPaymentUrl,
+          pseRedirectedOnce,
+          ...overrides,
+        };
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch {
+        // Ignorar errores de sessionStorage
+      }
+    },
+    [
+      selectedInstance.id,
+      selectedPlan.id,
+      billingCycle,
+      email,
+      fullName,
+      username,
+      accessToken,
+      paymentMethod,
+      nequiPhone,
+      transactionId,
+      transactionReference,
+      asyncPaymentUrl,
+      pseRedirectedOnce,
+    ]
+  );
+
+  // Cargar sesión previa (ej. al volver de redirección PSE con ?id=... o confirmación de correo)
   useEffect(() => {
     try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashQueryIdx = window.location.hash.indexOf('?');
+      const hashParams =
+        hashQueryIdx !== -1 ? new URLSearchParams(window.location.hash.slice(hashQueryIdx + 1)) : null;
+      const returnedTxId = searchParams.get('id') || hashParams?.get('id') || null;
+
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -211,11 +278,25 @@ const PricingPage = () => {
         if (parsed.fullName) setFullName(parsed.fullName);
         if (parsed.username) setUsername(parsed.username);
         if (parsed.accessToken) setAccessToken(parsed.accessToken);
-        if (parsed.transactionId && parsed.transactionReference && parsed.accessToken) {
-          setTransactionId(parsed.transactionId);
+        if (parsed.paymentMethod) setPaymentMethod(parsed.paymentMethod);
+        if (parsed.nequiPhone) setNequiPhone(parsed.nequiPhone);
+        if (parsed.asyncPaymentUrl) setAsyncPaymentUrl(parsed.asyncPaymentUrl);
+
+        const activeTxId = returnedTxId || parsed.transactionId;
+        if (activeTxId && parsed.transactionReference && parsed.accessToken) {
+          setTransactionId(activeTxId);
           setTransactionReference(parsed.transactionReference);
+          if (returnedTxId || parsed.pseRedirectedOnce) {
+            setPseRedirectedOnce(true);
+          }
           setCurrentStep(5);
         }
+      }
+
+      // Limpiar ?id= de la URL para evitar re-redirecciones al refrescar
+      if (returnedTxId && window.history.replaceState) {
+        const cleanUrl = `${window.location.origin}${window.location.pathname}#/precios`;
+        window.history.replaceState({}, document.title, cleanUrl);
       }
     } catch {
       // Ignorar errores de sessionStorage
@@ -224,25 +305,32 @@ const PricingPage = () => {
 
   // Guardar progreso en sessionStorage
   useEffect(() => {
-    try {
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          instanceId: selectedInstance.id,
-          planId: selectedPlan.id,
-          billingCycle,
-          email,
-          fullName,
-          username,
-          accessToken,
-          transactionId,
-          transactionReference,
-        })
-      );
-    } catch {
-      // Ignorar errores
-    }
-  }, [selectedInstance, selectedPlan, billingCycle, email, fullName, username, accessToken, transactionId, transactionReference]);
+    persistSessionSync();
+  }, [persistSessionSync]);
+
+  const loadPseBanks = useCallback(() => {
+    setPseBanksLoading(true);
+    setPseBanksError(null);
+    fetchPseFinancialInstitutions()
+      .then((banks) => {
+        const validBanks = banks.filter((b) => b.financial_institution_code !== '0');
+        setPseBanks(validBanks);
+        if (validBanks.length > 0) {
+          setPseBankCode((prev) =>
+            prev && prev !== '0' && validBanks.some((b) => b.financial_institution_code === prev)
+              ? prev
+              : validBanks[0].financial_institution_code
+          );
+        }
+      })
+      .catch((err) => {
+        console.warn('Error cargando bancos PSE:', err);
+        setPseBanksError('No se pudo cargar la lista de bancos PSE. Verifica tu conexión o intenta de nuevo.');
+      })
+      .finally(() => {
+        setPseBanksLoading(false);
+      });
+  }, []);
 
   // Cargar tokens de aceptación de Wompi y bancos PSE al llegar al paso 4
   useEffect(() => {
@@ -253,31 +341,51 @@ const PricingPage = () => {
           console.warn('Error cargando aceptación Wompi:', err);
         });
 
-      fetchPseFinancialInstitutions()
-        .then((banks) => {
-          setPseBanks(banks);
-          if (banks.length > 0 && !pseBankCode) {
-            const validBank = banks.find((b) => b.financial_institution_code !== '0') || banks[0];
-            setPseBankCode(validBank.financial_institution_code);
-          }
-        })
-        .catch((err) => {
-          console.warn('Error cargando bancos PSE:', err);
-        });
+      loadPseBanks();
     }
-  }, [currentStep, pseBankCode]);
+  }, [currentStep, loadPseBanks]);
 
   // Polling / Verificación de transacción en el Paso 5
   const pollTransactionVerification = useCallback(
-    async (txId: string, ref: string, token: string, backendUrl: string) => {
-      setIsProcessing(true);
-      setProcessingMessage('Verificando el estado de la transacción y activando tu cuenta...');
+    async (
+      txId: string,
+      ref: string,
+      token: string,
+      backendUrl: string,
+      method: 'CARD' | 'PSE' | 'NEQUI',
+      options?: { isInitialPseRedirect?: boolean }
+    ) => {
+      const currentRunId = ++pollRunIdRef.current;
+      const isInitialPse = Boolean(options?.isInitialPseRedirect && method === 'PSE');
+
       setPaymentError(null);
 
-      const maxAttempts = 12; // ~36 segundos de polling automático
+      if (method === 'NEQUI') {
+        // Para Nequi mostramos de inmediato las instrucciones de la notificación Push en el celular
+        // mientras consultamos en segundo plano cada 4 segundos hasta por 3 minutos
+        setTransactionStatus('PENDING');
+        setIsProcessing(false);
+        setIsPollingBackground(true);
+      } else if (isInitialPse) {
+        setIsProcessing(true);
+        setIsPollingBackground(false);
+        setProcessingMessage('Conectando con el portal PSE de tu entidad bancaria...');
+      } else {
+        setIsProcessing(true);
+        setIsPollingBackground(false);
+        setProcessingMessage('Verificando el estado de la transacción y activando tu cuenta...');
+      }
+
+      const maxAttempts = method === 'NEQUI' ? 45 : isInitialPse ? 15 : 15;
+      const delayMs = method === 'NEQUI' ? 4000 : isInitialPse ? 1500 : 3000;
+
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (pollRunIdRef.current !== currentRunId) return;
+
         try {
           const verifyRes = await verifyWompiTransaction(backendUrl, token, txId, ref);
+          if (pollRunIdRef.current !== currentRunId) return;
+
           setTransactionStatus(verifyRes.wompi_status);
 
           if (verifyRes.async_payment_url) {
@@ -286,6 +394,7 @@ const PricingPage = () => {
 
           if (verifyRes.wompi_status === 'APPROVED') {
             setIsProcessing(false);
+            setIsPollingBackground(false);
             return;
           }
 
@@ -295,37 +404,71 @@ const PricingPage = () => {
             verifyRes.wompi_status === 'ERROR'
           ) {
             setIsProcessing(false);
+            setIsPollingBackground(false);
+            const detailMsg = verifyRes.status_message ? ` (${verifyRes.status_message})` : '';
             setPaymentError(
-              `La transacción fue rechazada o cancelada por la pasarela (Estado: ${verifyRes.wompi_status}).`
+              `La transacción fue rechazada o declinada por la entidad financiera (Estado: ${verifyRes.wompi_status})${detailMsg}.`
             );
             return;
           }
 
-          // Si es PSE y ya tenemos la URL bancaria asíncrona, abrimos o mostramos el botón de inmediato
-          if (verifyRes.wompi_status === 'PENDING' && verifyRes.async_payment_url && attempt >= 2) {
+          // Si es el paso inicial de PSE y Wompi ya entregó la URL bancaria asíncrona (`async_payment_url`),
+          // guardamos la sesión síncronamente y redirigimos al usuario al banco PSE de inmediato
+          if (verifyRes.wompi_status === 'PENDING' && verifyRes.async_payment_url && method === 'PSE') {
+            setPseRedirectedOnce(true);
+            persistSessionSync({
+              transactionId: txId,
+              transactionReference: ref,
+              paymentMethod: 'PSE',
+              asyncPaymentUrl: verifyRes.async_payment_url,
+              pseRedirectedOnce: true,
+            });
             setIsProcessing(false);
-            return;
+            setIsPollingBackground(false);
+
+            if (isInitialPse) {
+              window.location.href = verifyRes.async_payment_url;
+              return;
+            }
           }
         } catch (err: unknown) {
           console.warn(`Intento de verificación ${attempt} falló:`, err);
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
 
-      // Si después de los intentos sigue en PENDING (ej. Nequi esperando push en el celular o PSE)
+      if (pollRunIdRef.current !== currentRunId) return;
       setTransactionStatus('PENDING');
       setIsProcessing(false);
+      setIsPollingBackground(false);
     },
-    []
+    [persistSessionSync]
   );
 
-  // Si entramos al paso 5 con una transacción pendiente de verificar
+  // Si entramos al paso 5 con una transacción pendiente de verificar (ej. al volver de PSE)
   useEffect(() => {
     if (currentStep === 5 && transactionId && transactionReference && accessToken && !transactionStatus) {
-      pollTransactionVerification(transactionId, transactionReference, accessToken, selectedInstance.backendUrl);
+      pollTransactionVerification(
+        transactionId,
+        transactionReference,
+        accessToken,
+        selectedInstance.backendUrl,
+        paymentMethod,
+        { isInitialPseRedirect: paymentMethod === 'PSE' && !pseRedirectedOnce }
+      );
     }
-  }, [currentStep, transactionId, transactionReference, accessToken, transactionStatus, pollTransactionVerification, selectedInstance.backendUrl]);
+  }, [
+    currentStep,
+    transactionId,
+    transactionReference,
+    accessToken,
+    transactionStatus,
+    pollTransactionVerification,
+    selectedInstance.backendUrl,
+    paymentMethod,
+    pseRedirectedOnce,
+  ]);
 
   const handleSelectInstance = (inst: InstanceOption) => {
     if (inst.id !== selectedInstance.id) {
@@ -427,6 +570,7 @@ const PricingPage = () => {
     setPaymentError(null);
     setTransactionStatus(null);
     setAsyncPaymentUrl(null);
+    setPseRedirectedOnce(false);
     setCurrentStep(5);
     setIsProcessing(true);
 
@@ -439,7 +583,7 @@ const PricingPage = () => {
         setMerchantAcceptance(acceptance);
       }
 
-      // 2. Construir payment_method_data según el método seleccionado
+      // 2. Construir payment_method_data según el método seleccionado (modelos de Sherlock backend)
       let paymentMethodData: CreateWompiTransactionRequest['payment_method_data'];
 
       if (paymentMethod === 'CARD') {
@@ -467,21 +611,25 @@ const PricingPage = () => {
           installments: Number(installments) || 1,
         };
       } else if (paymentMethod === 'PSE') {
-        if (!pseBankCode || !pseDocNumber) {
-          throw new Error('Por favor selecciona tu banco e ingresa tu número de documento para PSE.');
+        const cleanDocNumber = pseDocNumber.replace(/[^a-zA-Z0-9]/g, '');
+        if (!pseBankCode || pseBankCode === '0') {
+          throw new Error('Por favor selecciona una entidad bancaria válida para PSE.');
+        }
+        if (!cleanDocNumber || cleanDocNumber.length < 5) {
+          throw new Error('Ingresa un número de documento válido (mínimo 5 caracteres sin puntos ni guiones).');
         }
         paymentMethodData = {
           type: 'PSE',
           user_legal_id_type: pseDocType,
-          user_legal_id: pseDocNumber.trim(),
-          user_type: pseUserType,
+          user_legal_id: cleanDocNumber,
+          user_type: Number(pseUserType),
           financial_institution_code: pseBankCode,
-          payment_description: `Plan ${selectedPlan.name} ${selectedInstance.name}`.slice(0, 30),
+          payment_description: `Suscripcion ${selectedPlan.name} Almah`.slice(0, 30),
         };
       } else {
         const cleanPhone = nequiPhone.replace(/\D/g, '');
-        if (cleanPhone.length !== 10) {
-          throw new Error('Ingresa un número de celular Nequi válido de 10 dígitos.');
+        if (cleanPhone.length !== 10 || !cleanPhone.startsWith('3')) {
+          throw new Error('Ingresa un número de celular Nequi colombiano válido de 10 dígitos (debe iniciar con 3).');
         }
         paymentMethodData = {
           type: 'NEQUI',
@@ -490,8 +638,14 @@ const PricingPage = () => {
       }
 
       // 3. Registrar transacción en el backend de Sherlock con la cuenta del usuario
-      setProcessingMessage('Registrando pago en tu cuenta y procesando con Wompi...');
-      const returnUrl = window.location.href;
+      setProcessingMessage(
+        paymentMethod === 'PSE'
+          ? 'Iniciando transacción PSE con tu banco...'
+          : paymentMethod === 'NEQUI'
+          ? 'Enviando solicitud de pago a tu cuenta Nequi...'
+          : 'Registrando pago en tu cuenta y procesando con Wompi...'
+      );
+      const returnUrl = `${window.location.origin}${window.location.pathname}#/precios`;
 
       const txRes = await generateWompiTransaction(selectedInstance.backendUrl, accessToken, {
         subscription_type: selectedPlan.id,
@@ -508,26 +662,64 @@ const PricingPage = () => {
 
       setTransactionId(txRes.transaction_id);
       setTransactionReference(txRes.reference);
+      persistSessionSync({
+        transactionId: txRes.transaction_id,
+        transactionReference: txRes.reference,
+        paymentMethod,
+        pseRedirectedOnce: false,
+      });
 
-      // 4. Verificar la transacción y activar la suscripción en la tabla `profiles`
+      // 4. Verificar la transacción:
+      // - En PSE: obtiene `async_payment_url` y redirige al banco
+      // - En Nequi: muestra pantalla de notificación Push y hace polling hasta que apruebe en su celular
+      // - En Tarjeta: verifica aprobación y activa la suscripción en `profiles`
       await pollTransactionVerification(
         txRes.transaction_id,
         txRes.reference,
         accessToken,
-        selectedInstance.backendUrl
+        selectedInstance.backendUrl,
+        paymentMethod,
+        { isInitialPseRedirect: paymentMethod === 'PSE' }
       );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Ocurrió un error al procesar el pago.';
       setPaymentError(msg);
       setTransactionStatus('ERROR');
       setIsProcessing(false);
+      setIsPollingBackground(false);
     }
   };
 
   const handleManualVerify = () => {
     if (transactionId && transactionReference && accessToken) {
-      pollTransactionVerification(transactionId, transactionReference, accessToken, selectedInstance.backendUrl);
+      pollTransactionVerification(
+        transactionId,
+        transactionReference,
+        accessToken,
+        selectedInstance.backendUrl,
+        paymentMethod,
+        { isInitialPseRedirect: false }
+      );
     }
+  };
+
+  const handleRetryPaymentMethod = () => {
+    pollRunIdRef.current += 1;
+    setIsProcessing(false);
+    setIsPollingBackground(false);
+    setTransactionId(null);
+    setTransactionReference(null);
+    setTransactionStatus(null);
+    setAsyncPaymentUrl(null);
+    setPaymentError(null);
+    setPseRedirectedOnce(false);
+    persistSessionSync({
+      transactionId: null,
+      transactionReference: null,
+      asyncPaymentUrl: null,
+      pseRedirectedOnce: false,
+    });
+    setCurrentStep(4);
   };
 
   const handleRedirect = () => {
@@ -1746,19 +1938,44 @@ const PricingPage = () => {
                 {paymentMethod === 'PSE' && (
                   <>
                     <div>
-                      <label
+                      <div
                         style={{
-                          display: 'block',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: '#334155',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
                           marginBottom: '6px',
                         }}
                       >
-                        Selecciona tu Banco
-                      </label>
+                        <label
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: '#334155',
+                          }}
+                        >
+                          Selecciona tu Banco
+                        </label>
+                        {pseBanksError && (
+                          <button
+                            type="button"
+                            onClick={loadPseBanks}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#0f766e',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                            }}
+                          >
+                            Reintentar carga de bancos
+                          </button>
+                        )}
+                      </div>
                       <select
                         required
+                        disabled={pseBanksLoading}
                         value={pseBankCode}
                         onChange={(e) => setPseBankCode(e.target.value)}
                         style={{
@@ -1767,17 +1984,24 @@ const PricingPage = () => {
                           borderRadius: '10px',
                           border: '1px solid #cbd5e1',
                           fontSize: '14px',
-                          backgroundColor: '#ffffff',
+                          backgroundColor: pseBanksLoading ? '#f8fafc' : '#ffffff',
                           boxSizing: 'border-box',
                         }}
                       >
-                        {pseBanks.length === 0 && <option value="1">Banco que aprueba (Sandbox)</option>}
-                        {pseBanks.map((b) => (
-                          <option key={b.financial_institution_code} value={b.financial_institution_code}>
-                            {b.financial_institution_name}
-                          </option>
-                        ))}
+                        {pseBanksLoading && <option value="">Cargando entidades bancarias de PSE...</option>}
+                        {!pseBanksLoading && pseBanks.length === 0 && (
+                          <option value="1">Banco que aprueba (Sandbox)</option>
+                        )}
+                        {!pseBanksLoading &&
+                          pseBanks.map((b) => (
+                            <option key={b.financial_institution_code} value={b.financial_institution_code}>
+                              {b.financial_institution_name}
+                            </option>
+                          ))}
                       </select>
+                      {pseBanksError && (
+                        <p style={{ fontSize: '12px', color: '#b91c1c', margin: '6px 0 0' }}>{pseBanksError}</p>
+                      )}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -1795,7 +2019,15 @@ const PricingPage = () => {
                         </label>
                         <select
                           value={pseUserType}
-                          onChange={(e) => setPseUserType(Number(e.target.value))}
+                          onChange={(e) => {
+                            const nextType = Number(e.target.value);
+                            setPseUserType(nextType);
+                            if (nextType === 1 && pseDocType === 'CC') {
+                              setPseDocType('NIT');
+                            } else if (nextType === 0 && pseDocType === 'NIT') {
+                              setPseDocType('CC');
+                            }
+                          }}
                           style={{
                             width: '100%',
                             padding: '12px 14px',
@@ -1838,6 +2070,7 @@ const PricingPage = () => {
                           <option value="CC">Cédula de Ciudadanía (CC)</option>
                           <option value="NIT">NIT</option>
                           <option value="CE">Cédula de Extranjería (CE)</option>
+                          <option value="TI">Tarjeta de Identidad (TI)</option>
                           <option value="PP">Pasaporte (PP)</option>
                         </select>
                       </div>
@@ -1853,15 +2086,15 @@ const PricingPage = () => {
                           marginBottom: '6px',
                         }}
                       >
-                        Número de identificación
+                        Número de identificación (sin puntos ni guiones)
                       </label>
                       <input
                         type="text"
                         required
                         minLength={5}
                         value={pseDocNumber}
-                        onChange={(e) => setPseDocNumber(e.target.value)}
-                        placeholder="Ej: 1020304050"
+                        onChange={(e) => setPseDocNumber(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                        placeholder={pseDocType === 'NIT' ? 'Ej: 9001234567' : 'Ej: 1020304050'}
                         style={{
                           width: '100%',
                           padding: '12px 16px',
@@ -1871,6 +2104,9 @@ const PricingPage = () => {
                           boxSizing: 'border-box',
                         }}
                       />
+                      <p style={{ fontSize: '12px', color: '#64748b', margin: '6px 0 0' }}>
+                        Serás redirigido de forma segura al portal PSE de tu banco para autorizar el débito.
+                      </p>
                     </div>
                   </>
                 )}
@@ -1893,8 +2129,9 @@ const PricingPage = () => {
                       type="tel"
                       required
                       maxLength={10}
+                      minLength={10}
                       value={nequiPhone}
-                      onChange={(e) => setNequiPhone(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => setNequiPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       placeholder="3001234567"
                       style={{
                         width: '100%',
@@ -1905,8 +2142,9 @@ const PricingPage = () => {
                         boxSizing: 'border-box',
                       }}
                     />
-                    <p style={{ fontSize: '12px', color: '#64748b', margin: '6px 0 0' }}>
-                      Recibirás una notificación push en tu app de Nequi para aprobar la suscripción.
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '6px 0 0', lineHeight: 1.4 }}>
+                      Enviaremos una notificación push directa a tu app de <strong>Nequi</strong> para que apruebes el
+                      pago desde tu celular.
                     </p>
                   </div>
                 )}
@@ -2008,7 +2246,11 @@ const PricingPage = () => {
                       cursor: 'pointer',
                     }}
                   >
-                    Pagar {activePrice}
+                    {paymentMethod === 'PSE'
+                      ? `Continuar a PSE (${activePrice})`
+                      : paymentMethod === 'NEQUI'
+                      ? `Pagar con Nequi (${activePrice})`
+                      : `Pagar ${activePrice}`}
                   </button>
                 </div>
               </form>
@@ -2149,6 +2391,144 @@ const PricingPage = () => {
                   Ingresar a {selectedInstance.name} →
                 </button>
               </div>
+            ) : transactionStatus === 'PENDING' && paymentMethod === 'NEQUI' ? (
+              <div
+                style={{
+                  maxWidth: '560px',
+                  margin: '0 auto',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '20px',
+                  padding: '44px',
+                  boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #e2e8f0',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f3e8ff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 20px',
+                    color: '#7e22ce',
+                    fontSize: '32px',
+                    fontWeight: 800,
+                  }}
+                >
+                  📱
+                </div>
+
+                <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 10px', color: '#0f172a' }}>
+                  Aprueba el pago en tu app de Nequi
+                </h2>
+                <p style={{ fontSize: '15px', color: '#64748b', margin: '0 0 20px', lineHeight: 1.5 }}>
+                  Enviamos una solicitud de cobro por <strong>{activePrice}</strong> al celular Nequi{' '}
+                  <strong>{nequiPhone}</strong> (Ref: <strong>{transactionReference}</strong>).
+                </p>
+
+                <div
+                  style={{
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '14px',
+                    padding: '18px 20px',
+                    textAlign: 'left',
+                    marginBottom: '22px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    fontSize: '14px',
+                    color: '#334155',
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '2px' }}>
+                    Sigue estos pasos en tu celular:
+                  </div>
+                  <div>
+                    <strong>1.</strong> Abre la aplicación de <strong>Nequi</strong> en tu celular ({nequiPhone}).
+                  </div>
+                  <div>
+                    <strong>2.</strong> Toca la notificación push recibida o ingresa a la campana de{' '}
+                    <strong>Notificaciones 🔔</strong>.
+                  </div>
+                  <div>
+                    <strong>3.</strong> Confirma el pago por <strong>{activePrice}</strong>. Esta pantalla se
+                    actualizará automáticamente.
+                  </div>
+                </div>
+
+                {isPollingBackground && (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '8px 16px',
+                      backgroundColor: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
+                      borderRadius: '999px',
+                      color: '#15803d',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      marginBottom: '20px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: '50%',
+                        border: '2px solid #86efac',
+                        borderTopColor: '#16a34a',
+                        animation: 'spin 1s linear infinite',
+                        display: 'inline-block',
+                      }}
+                    />
+                    Esperando tu aprobación en Nequi en tiempo real...
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleManualVerify}
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    backgroundColor: '#00DC94',
+                    color: '#042f2e',
+                    fontSize: '15px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    marginBottom: '12px',
+                  }}
+                >
+                  🔄 Ya aprobé en mi Nequi • Verificar estado ahora
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRetryPaymentMethod}
+                  style={{
+                    width: '100%',
+                    padding: '13px',
+                    borderRadius: '12px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    color: '#475569',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ← Cambiar número Nequi o elegir otro medio de pago
+                </button>
+              </div>
             ) : transactionStatus === 'PENDING' ? (
               <div
                 style={{
@@ -2177,22 +2557,22 @@ const PricingPage = () => {
                     fontWeight: 800,
                   }}
                 >
-                  ⏳
+                  🏦
                 </div>
 
                 <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 10px', color: '#0f172a' }}>
-                  Pago pendiente de confirmación
+                  {paymentMethod === 'PSE'
+                    ? 'Completa o verifica tu pago en PSE'
+                    : 'Pago pendiente de confirmación'}
                 </h2>
                 <p style={{ fontSize: '15px', color: '#64748b', margin: '0 0 24px', lineHeight: 1.5 }}>
                   Tu transacción (Ref: <strong>{transactionReference}</strong>) está registrada en tu cuenta{' '}
-                  <strong>{email}</strong> y está esperando confirmación de tu entidad financiera.
+                  <strong>{email}</strong> y está esperando confirmación de tu entidad bancaria.
                 </p>
 
                 {asyncPaymentUrl && (
                   <a
                     href={asyncPaymentUrl}
-                    target="_blank"
-                    rel="noreferrer"
                     style={{
                       display: 'block',
                       width: '100%',
@@ -2227,7 +2607,25 @@ const PricingPage = () => {
                     marginBottom: '12px',
                   }}
                 >
-                  🔄 Ya realicé el pago • Verificar estado ahora
+                  🔄 Ya realicé el pago en el banco • Verificar estado ahora
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRetryPaymentMethod}
+                  style={{
+                    width: '100%',
+                    padding: '13px',
+                    borderRadius: '12px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff',
+                    color: '#475569',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ← Intentar con otro medio de pago
                 </button>
               </div>
             ) : (
@@ -2270,7 +2668,7 @@ const PricingPage = () => {
 
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(4)}
+                  onClick={handleRetryPaymentMethod}
                   style={{
                     width: '100%',
                     padding: '15px',

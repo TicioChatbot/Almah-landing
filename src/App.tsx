@@ -10,6 +10,17 @@ import CoursesPage from './pages/CoursesPage'
 import CreateCoursePage from './pages/CreateCoursePage'
 import './index.css'
 
+// Si el usuario regresa desde la pasarela bancaria PSE (Wompi agrega ?id=... en la URL)
+// y el banco o pasarela omitió el hash #/precios, redirigimos automáticamente a #/precios
+if (typeof window !== 'undefined') {
+  const searchParams = new URLSearchParams(window.location.search)
+  const hasWompiTxId = searchParams.has('id')
+  const hasCheckoutSession = Boolean(sessionStorage.getItem('almah_checkout_session'))
+  if (hasWompiTxId && hasCheckoutSession && (!window.location.hash || window.location.hash === '#/')) {
+    window.location.hash = '#/precios'
+  }
+}
+
 function App() {
   return (
     <Router>
