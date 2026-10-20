@@ -1,0 +1,334 @@
+// Servicio de comunicación con el Backend de Sherlock y la API pública de Wompi
+
+export interface SignupPayload {
+  email: string;
+  password: string;
+  options: {
+    data: {
+      full_name: string;
+      username: string;
+      avatar_url?: string;
+    };
+  };
+}
+
+export interface SignupResponse {
+  message: string;
+  status: string;
+  email: string;
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+}
+
+export interface LoginResponse {
+  message: string;
+  email: string;
+  role: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: {
+    id: string;
+    role: string;
+    full_name: string;
+    username: string;
+    avatar_url: string;
+  };
+}
+
+export interface UserMeResponse {
+  id: string;
+  email: string;
+  full_name?: string;
+  username?: string;
+  avatar_url?: string;
+  role?: string;
+  is_subscribed?: boolean;
+  last_payment_at?: string;
+  subscription_expires_at?: string;
+  subscription_type?: string;
+  subscription_duration?: string;
+}
+
+export interface CardMethodData {
+  type: 'CARD';
+  token: string;
+  installments: number;
+}
+
+export interface PseMethodData {
+  type: 'PSE';
+  user_legal_id_type: string;
+  user_legal_id: string;
+  user_type: number; // 0 = Persona Natural, 1 = Persona Jurídica
+  financial_institution_code: string;
+  payment_description: string;
+}
+
+export interface NequiMethodData {
+  type: 'NEQUI';
+  phone_number: string;
+}
+
+export type PaymentMethodUnion = CardMethodData | PseMethodData | NequiMethodData;
+
+export interface CreateWompiTransactionRequest {
+  subscription_type: 'START' | 'PRO' | 'TEAM' | 'STRATEGIC';
+  subscription_duration: 'MENSUAL' | 'ANUAL';
+  amount_in_cents: number;
+  currency: string;
+  customer_email: string;
+  payment_method_type: 'CARD' | 'PSE' | 'NEQUI';
+  redirect_url?: string;
+  payment_method_data: PaymentMethodUnion;
+  acceptance_token: string;
+  accept_personal_auth: string;
+}
+
+export interface WompiGenerateResponse {
+  transaction_id: string;
+  reference: string;
+  payment_method_type: string;
+  amount_in_cents: number;
+  currency: string;
+  status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR';
+}
+
+export interface WompiVerifyResponse {
+  status: 'still_pending' | 'processed' | 'already_processed';
+  reference: string;
+  payment_method_type: string;
+  amount_in_cents: number;
+  wompi_status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR';
+  async_payment_url?: string | null;
+}
+
+export interface FinancialInstitution {
+  financial_institution_code: string;
+  financial_institution_name: string;
+}
+
+export interface WompiMerchantAcceptance {
+  acceptance_token: string;
+  accept_personal_auth: string;
+  terms_permalink: string;
+  personal_data_permalink: string;
+}
+
+const getWompiApiUrl = () =>
+  (import.meta.env.VITE_WOMPI_API_URL || 'https://sandbox.wompi.co/v1').replace(/\/$/, '');
+
+const getWompiPublicKey = () =>
+  import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_test_Q5yDA9xoKdePzhSGeVe9HAez7HgGORGf';
+
+function extractErrorMessage(errBody: unknown, status: number): string {
+  if (!errBody || typeof errBody !== 'object') {
+    return `Error del servidor (${status})`;
+  }
+  const body = errBody as Record<string, unknown>;
+  if (typeof body.detail === 'string') return body.detail;
+  if (body.detail && typeof body.detail === 'object') {
+    const detailObj = body.detail as Record<string, unknown>;
+    if (typeof detailObj.message === 'string') return detailObj.message;
+    if (typeof detailObj.detail === 'string') return detailObj.detail;
+    return JSON.stringify(detailObj);
+  }
+  if (typeof body.message === 'string') return body.message;
+  return `Error en la solicitud (${status})`;
+}
+
+/**
+ * Registra un usuario en la instancia seleccionada (`POST /auth/signup_user`)
+ */
+export async function signupUser(backendUrl: string, payload: SignupPayload): Promise<SignupResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  const res = await fetch(`${baseUrl}/auth/signup_user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as SignupResponse;
+}
+
+/**
+ * Inicia sesión en la instancia seleccionada (`POST /auth/login_user`)
+ */
+export async function loginUser(backendUrl: string, email: string, password: string): Promise<LoginResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  const res = await fetch(`${baseUrl}/auth/login_user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as LoginResponse;
+}
+
+/**
+ * Obtiene el perfil del usuario autenticado (`GET /auth/me`)
+ */
+export async function getCurrentUser(backendUrl: string, accessToken: string): Promise<UserMeResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  const res = await fetch(`${baseUrl}/auth/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as UserMeResponse;
+}
+
+/**
+ * Obtiene los tokens de aceptación de términos y datos personales del comercio en Wompi
+ * (`GET https://.../v1/merchants/{PUBLIC_KEY}`)
+ */
+export async function fetchWompiMerchantAcceptance(customPublicKey?: string): Promise<WompiMerchantAcceptance> {
+  const pubKey = customPublicKey || getWompiPublicKey();
+  const wompiUrl = getWompiApiUrl();
+
+  const res = await fetch(`${wompiUrl}/merchants/${pubKey}`);
+  const json = await res.json().catch(() => ({}));
+
+  if (!res.ok || !json?.data) {
+    throw new Error('No se pudieron obtener los tokens de aceptación de Wompi. Verifica VITE_WOMPI_PUBLIC_KEY.');
+  }
+
+  const presignedAcceptance = json.data.presigned_acceptance || {};
+  const presignedPersonal = json.data.presigned_personal_data_auth || {};
+
+  return {
+    acceptance_token: presignedAcceptance.acceptance_token || '',
+    accept_personal_auth: presignedPersonal.acceptance_token || presignedAcceptance.acceptance_token || '',
+    terms_permalink: presignedAcceptance.permalink || 'https://wompi.com/es/co/reglamento-usuarios-colombia',
+    personal_data_permalink: presignedPersonal.permalink || 'https://wompi.com/es/co/autorizacion-administracion-datos-personales',
+  };
+}
+
+/**
+ * Obtiene la lista de bancos disponibles para PSE desde Wompi
+ * (`GET https://.../v1/pse/financial_institutions`)
+ */
+export async function fetchPseFinancialInstitutions(customPublicKey?: string): Promise<FinancialInstitution[]> {
+  const pubKey = customPublicKey || getWompiPublicKey();
+  const wompiUrl = getWompiApiUrl();
+
+  const res = await fetch(`${wompiUrl}/pse/financial_institutions`, {
+    headers: {
+      Authorization: `Bearer ${pubKey}`,
+    },
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || !Array.isArray(json?.data)) {
+    throw new Error('No se pudo cargar la lista de bancos PSE desde Wompi.');
+  }
+  return json.data as FinancialInstitution[];
+}
+
+/**
+ * Tokeniza una tarjeta de crédito/débito directamente con Wompi (`POST /v1/tokens/cards`)
+ * Nunca envía el PAN/CVV al backend de Sherlock, sino el token seguro `tok_...`
+ */
+export async function tokenizeCardWithWompi(
+  card: {
+    number: string;
+    cvc: string;
+    exp_month: string;
+    exp_year: string;
+    card_holder: string;
+  },
+  customPublicKey?: string
+): Promise<string> {
+  const pubKey = customPublicKey || getWompiPublicKey();
+  const wompiUrl = getWompiApiUrl();
+
+  const res = await fetch(`${wompiUrl}/tokens/cards`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${pubKey}`,
+    },
+    body: JSON.stringify(card),
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json.status !== 'CREATED' || !json?.data?.id) {
+    const errMessages = json?.error?.messages
+      ? Object.values(json.error.messages).flat().join(', ')
+      : 'Datos de tarjeta inválidos o rechazados por Wompi.';
+    throw new Error(errMessages);
+  }
+
+  return json.data.id as string;
+}
+
+/**
+ * Crea la transacción en el backend de Sherlock y la registra a la cuenta autenticada
+ * (`POST /wompi/transactions/generate`)
+ */
+export async function generateWompiTransaction(
+  backendUrl: string,
+  accessToken: string,
+  payload: CreateWompiTransactionRequest
+): Promise<WompiGenerateResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  const res = await fetch(`${baseUrl}/wompi/transactions/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as WompiGenerateResponse;
+}
+
+/**
+ * Verifica el estado de una transacción en el backend de Sherlock y activa la suscripción en `profiles` si fue `APPROVED`
+ * (`POST /wompi/transactions/verify`)
+ */
+export async function verifyWompiTransaction(
+  backendUrl: string,
+  accessToken: string,
+  wompiTransactionId: string,
+  reference: string
+): Promise<WompiVerifyResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+  const res = await fetch(`${baseUrl}/wompi/transactions/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      wompi_transaction_id: wompiTransactionId,
+      reference,
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as WompiVerifyResponse;
+}
