@@ -6,6 +6,8 @@ import ServicesPage from './pages/ServicesPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import PricingPage from './pages/PricingPage'
+import CoursesPage from './pages/CoursesPage'
+import CreateCoursePage from './pages/CreateCoursePage'
 import './index.css'
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/servicios" element={<ServicesPage />} />
+          <Route path="/cursos" element={<CoursesPage />} />
+          <Route path="/crea-tu-curso" element={<CreateCoursePage />} />
           <Route path="/sobre-nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/precios" element={<PricingPage />} />

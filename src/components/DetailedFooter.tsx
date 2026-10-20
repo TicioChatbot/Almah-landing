@@ -19,10 +19,11 @@ const DetailedFooter = () => {
           <div>
             <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '1.5rem' }}>Plataforma</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '16px', color: '#A0A0A0' }}>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Home</a>
-              <a href="#servicios" style={{ color: 'inherit', textDecoration: 'none' }}>Servicios</a>
-              <a href="#about" style={{ color: 'inherit', textDecoration: 'none' }}>Sobre nosotros</a>
-              <a href="#blog" style={{ color: 'inherit', textDecoration: 'none' }}>Blog</a>
+              <a href="#/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</a>
+              <a href="#/servicios" style={{ color: 'inherit', textDecoration: 'none' }}>Servicios</a>
+              <a href="#/cursos" style={{ color: 'inherit', textDecoration: 'none' }}>Cursos</a>
+              <a href="#/sobre-nosotros" style={{ color: 'inherit', textDecoration: 'none' }}>Sobre nosotros</a>
+              <a href="#/precios" style={{ color: 'inherit', textDecoration: 'none' }}>Precios</a>
             </div>
           </div>
 
