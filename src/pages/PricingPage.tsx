@@ -149,7 +149,7 @@ const PricingPage = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState(presetAvatars[0]);
+  const [avatarUrl] = useState(presetAvatars[0]);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
@@ -1335,42 +1335,7 @@ const PricingPage = () => {
                   />
                 </div>
 
-                {authMode === 'signup' && (
-                  <div>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        color: '#334155',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      Selecciona un avatar para tu perfil
-                    </label>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      {presetAvatars.map((url, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setAvatarUrl(url)}
-                          style={{
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '50%',
-                            padding: 0,
-                            overflow: 'hidden',
-                            border: avatarUrl === url ? '3px solid #00DC94' : '2px solid transparent',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          <img src={url} alt={`Avatar ${idx + 1}`} style={{ width: '100%', height: '100%' }} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
                   <button
