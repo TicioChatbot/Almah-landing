@@ -433,3 +433,68 @@ export async function verifyWompiTransaction(
 
   return result;
 }
+
+export interface CreateWompiTrialSubscriptionRequest {
+  subscription_type: 'START' | 'PRO' | 'TEAM' | 'STRATEGIC';
+  subscription_duration: 'MENSUAL' | 'ANUAL';
+  customer_email: string;
+  acceptance_token: string;
+  accept_personal_auth: string;
+  payment_source?: {
+    type: 'CARD';
+    token: string;
+    installments?: number;
+  };
+  card_token?: string;
+  token?: string;
+  installments?: number;
+  trial_months?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface WompiTrialSubscriptionResponse {
+  message?: string;
+  status?: string;
+  subscription_id?: string;
+  id?: string;
+  trial_end?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Inscribe una tarjeta e inicia el período de prueba (Trial) de la suscripción
+ * (POST /wompi/subscriptions/trial)
+ */
+export async function createWompiTrialSubscription(
+  backendUrl: string,
+  payload: CreateWompiTrialSubscriptionRequest
+): Promise<WompiTrialSubscriptionResponse> {
+  const baseUrl = backendUrl.replace(/\/$/, '');
+
+  const cardTok = payload.card_token || payload.payment_source?.token || payload.token || '';
+  const requestBody = {
+    ...payload,
+    payment_source: payload.payment_source || {
+      type: 'CARD' as const,
+      token: cardTok,
+      installments: payload.installments || 1,
+    },
+    card_token: cardTok,
+    token: cardTok,
+    installments: payload.installments || payload.payment_source?.installments || 1,
+  };
+
+  const res = await fetch(baseUrl + '/wompi/subscriptions/trial', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(extractErrorMessage(data, res.status));
+  }
+  return data as WompiTrialSubscriptionResponse;
+}
