@@ -1,5 +1,3 @@
-
-
 import logo from '../assets/logo-high.png';
 
 const DetailedFooter = () => {
@@ -21,6 +19,8 @@ const DetailedFooter = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '16px', color: '#A0A0A0' }}>
               <a href="#/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</a>
               <a href="#/servicios" style={{ color: 'inherit', textDecoration: 'none' }}>Servicios</a>
+              <a href="#/hub" style={{ color: 'inherit', textDecoration: 'none' }}>Hub de Privacidad</a>
+              <a href="#/fintech" style={{ color: 'inherit', textDecoration: 'none' }}>Fintech School</a>
               <a href="#/cursos" style={{ color: 'inherit', textDecoration: 'none' }}>Cursos</a>
               <a href="#/sobre-nosotros" style={{ color: 'inherit', textDecoration: 'none' }}>Sobre nosotros</a>
               <a href="#/precios" style={{ color: 'inherit', textDecoration: 'none' }}>Precios</a>

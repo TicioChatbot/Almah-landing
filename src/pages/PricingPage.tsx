@@ -675,7 +675,7 @@ const PricingPage = () => {
                 marginBottom: '40px',
               }}
             >
-              {/* Opción 1: Licencia para mí */}
+              {/* Opción 1: Tarjeta de crédito */}
               <div
                 onClick={() => handleSelectLicenseType('PERSONAL')}
                 style={{
@@ -707,31 +707,15 @@ const PricingPage = () => {
                     fontWeight: 800,
                   }}
                 >
-                  🎉 2 MESES GRATIS
+                  2 MESES GRATIS
                 </div>
 
                 <div>
-                  <div
-                    style={{
-                      width: '54px',
-                      height: '54px',
-                      borderRadius: '14px',
-                      backgroundColor: '#f0fdf4',
-                      color: '#16a34a',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '26px',
-                      marginBottom: '18px',
-                    }}
-                  >
-                    👤
-                  </div>
                   <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 10px', color: '#0f172a' }}>
-                    Licencia para mí
+                    Pago con Tarjeta de crédito
                   </h3>
                   <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 18px' }}>
-                    Para consultores, abogados, DPOs y profesionales individuales. Obtén acceso inmediato inscribiendo tu tarjeta con <strong>2 meses 100% gratis</strong> de prueba.
+                    Para consultores, abogados, DPOs y profesionales individuales. Acceso inmediato inscribiendo tu tarjeta con <strong>2 meses 100% gratis</strong> de prueba.
                   </p>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <li style={{ fontSize: '13px', color: '#334155', display: 'flex', gap: '8px' }}>
@@ -768,7 +752,7 @@ const PricingPage = () => {
                 </button>
               </div>
 
-              {/* Opción 2: Pago Corporativo */}
+              {/* Opción 2: Otros medios de pago */}
               <div
                 onClick={() => handleSelectLicenseType('CORPORATE')}
                 style={{
@@ -804,24 +788,8 @@ const PricingPage = () => {
                 </div>
 
                 <div>
-                  <div
-                    style={{
-                      width: '54px',
-                      height: '54px',
-                      borderRadius: '14px',
-                      backgroundColor: '#f8fafc',
-                      color: '#0f172a',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '26px',
-                      marginBottom: '18px',
-                    }}
-                  >
-                    🏢
-                  </div>
                   <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 10px', color: '#0f172a' }}>
-                    Pago corporativo
+                    Otros medios de pago
                   </h3>
                   <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 24px' }}>
                     Planes para equipos, firmas y departamentos legales. Facturación corporativa con soporte por órdenes de compra, múltiples usuarios y acompañamiento a medida.
@@ -846,7 +814,7 @@ const PricingPage = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  Ver planes corporativos y precios ↓
+                  Contacta ventas
                 </button>
               </div>
             </div>

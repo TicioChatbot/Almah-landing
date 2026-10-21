@@ -8,6 +8,8 @@ import ContactPage from './pages/ContactPage'
 import PricingPage from './pages/PricingPage'
 import CoursesPage from './pages/CoursesPage'
 import CreateCoursePage from './pages/CreateCoursePage'
+import HubPage from './pages/HubPage'
+import FintechPage from './pages/FintechPage'
 import './index.css'
 
 // Si el usuario regresa desde la pasarela bancaria PSE (Wompi agrega ?id=... en la URL)
@@ -34,6 +36,8 @@ function App() {
           <Route path="/sobre-nosotros" element={<AboutPage />} />
           <Route path="/contacto" element={<ContactPage />} />
           <Route path="/precios" element={<PricingPage />} />
+          <Route path="/hub" element={<HubPage />} />
+          <Route path="/fintech" element={<FintechPage />} />
         </Routes>
         <DetailedFooter />
       </div>
