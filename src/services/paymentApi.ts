@@ -71,6 +71,11 @@ export interface NequiMethodData {
   phone_number: string;
 }
 
+export interface CustomerData {
+  full_name: string;
+  phone_number: string;
+}
+
 export type PaymentMethodUnion = CardMethodData | PseMethodData | NequiMethodData;
 
 export interface CreateWompiTransactionRequest {
@@ -79,9 +84,10 @@ export interface CreateWompiTransactionRequest {
   amount_in_cents: number;
   currency: string;
   customer_email: string;
-  payment_method_type: 'CARD' | 'PSE' | 'NEQUI';
+  payment_method_type: 'CARD' | 'PSE' | 'NEQUI' | 'BANCOLOMBIA_TRANSFER';
   redirect_url?: string;
   payment_method_data: PaymentMethodUnion;
+  customer_data?: CustomerData;
   acceptance_token: string;
   accept_personal_auth: string;
 }
@@ -93,6 +99,7 @@ export interface WompiGenerateResponse {
   amount_in_cents: number;
   currency: string;
   status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'VOIDED' | 'ERROR';
+  async_payment_url?: string | null;
 }
 
 export interface WompiVerifyResponse {

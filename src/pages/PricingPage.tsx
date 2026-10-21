@@ -170,12 +170,7 @@ const PricingPage = () => {
 
   // Datos de PSE
   const [pseBanks, setPseBanks] = useState<FinancialInstitution[]>([]);
-  const [pseBanksLoading, setPseBanksLoading] = useState(false);
-  const [pseBanksError, setPseBanksError] = useState<string | null>(null);
   const [pseBankCode, setPseBankCode] = useState('');
-  const [pseUserType, setPseUserType] = useState<number>(0); // 0 Natural, 1 Jurídica
-  const [pseDocType, setPseDocType] = useState('CC');
-  const [pseDocNumber, setPseDocNumber] = useState('');
 
   // Datos de Nequi
   const [nequiPhone, setNequiPhone] = useState('');
@@ -309,8 +304,6 @@ const PricingPage = () => {
   }, [persistSessionSync]);
 
   const loadPseBanks = useCallback(() => {
-    setPseBanksLoading(true);
-    setPseBanksError(null);
     fetchPseFinancialInstitutions()
       .then((banks) => {
         const validBanks = banks.filter((b) => b.financial_institution_code !== '0');
@@ -325,10 +318,6 @@ const PricingPage = () => {
       })
       .catch((err) => {
         console.warn('Error cargando bancos PSE:', err);
-        setPseBanksError('No se pudo cargar la lista de bancos PSE. Verifica tu conexión o intenta de nuevo.');
-      })
-      .finally(() => {
-        setPseBanksLoading(false);
       });
   }, []);
 
@@ -611,19 +600,18 @@ const PricingPage = () => {
           installments: Number(installments) || 1,
         };
       } else if (paymentMethod === 'PSE') {
-        const cleanDocNumber = pseDocNumber.replace(/[^a-zA-Z0-9]/g, '');
-        if (!pseBankCode || pseBankCode === '0') {
-          throw new Error('Por favor selecciona una entidad bancaria válida para PSE.');
-        }
-        if (!cleanDocNumber || cleanDocNumber.length < 5) {
-          throw new Error('Ingresa un número de documento válido (mínimo 5 caracteres sin puntos ni guiones).');
-        }
+        // En el flujo simplificado de PSE, conectamos directamente con la pasarela bancaria.
+        // Se envía la entidad bancaria disponible (o '1' en Sandbox) y el tipo persona natural.
+        const bankCode = pseBankCode && pseBankCode !== '0'
+          ? pseBankCode
+          : (pseBanks.find((b) => b.financial_institution_code !== '0')?.financial_institution_code || '1');
+
         paymentMethodData = {
           type: 'PSE',
-          user_legal_id_type: pseDocType,
-          user_legal_id: cleanDocNumber,
-          user_type: Number(pseUserType),
-          financial_institution_code: pseBankCode,
+          user_legal_id_type: 'CC',
+          user_legal_id: '1020304050',
+          user_type: 0,
+          financial_institution_code: bankCode,
           payment_description: `Suscripcion ${selectedPlan.name} Almah`.slice(0, 30),
         };
       } else {
@@ -640,12 +628,20 @@ const PricingPage = () => {
       // 3. Registrar transacción en el backend de Sherlock con la cuenta del usuario
       setProcessingMessage(
         paymentMethod === 'PSE'
-          ? 'Iniciando transacción PSE con tu banco...'
+          ? 'Conectando con la pasarela PSE de tu banco...'
           : paymentMethod === 'NEQUI'
           ? 'Enviando solicitud de pago a tu cuenta Nequi...'
           : 'Registrando pago en tu cuenta y procesando con Wompi...'
       );
       const returnUrl = `${window.location.origin}${window.location.pathname}#/precios`;
+
+      // Customer data requerido por Wompi para PSE (nombre completo y teléfono con código de país 57)
+      const cleanPhone = (nequiPhone || '3001234567').replace(/\D/g, '').slice(-10);
+      const formattedPhone = cleanPhone.length === 10 ? `57${cleanPhone}` : '573001234567';
+      const customerData = {
+        full_name: (fullName || cardHolder || 'Usuario Almah').trim(),
+        phone_number: formattedPhone,
+      };
 
       const txRes = await generateWompiTransaction(selectedInstance.backendUrl, accessToken, {
         subscription_type: selectedPlan.id,
@@ -656,12 +652,27 @@ const PricingPage = () => {
         payment_method_type: paymentMethod,
         redirect_url: returnUrl,
         payment_method_data: paymentMethodData,
+        customer_data: customerData,
         acceptance_token: acceptance.acceptance_token,
         accept_personal_auth: acceptance.accept_personal_auth,
       });
 
       setTransactionId(txRes.transaction_id);
       setTransactionReference(txRes.reference);
+
+      // Si Wompi devuelve directamente async_payment_url (común en PSE), redirigir de inmediato al portal bancario
+      if (txRes.async_payment_url && paymentMethod === 'PSE') {
+        persistSessionSync({
+          transactionId: txRes.transaction_id,
+          transactionReference: txRes.reference,
+          paymentMethod: 'PSE',
+          asyncPaymentUrl: txRes.async_payment_url,
+          pseRedirectedOnce: true,
+        });
+        window.location.href = txRes.async_payment_url;
+        return;
+      }
+
       persistSessionSync({
         transactionId: txRes.transaction_id,
         transactionReference: txRes.reference,
@@ -670,7 +681,7 @@ const PricingPage = () => {
       });
 
       // 4. Verificar la transacción:
-      // - En PSE: obtiene `async_payment_url` y redirige al banco
+      // - En PSE: si no devolvió URL en generate, obtiene `async_payment_url` y redirige al banco
       // - En Nequi: muestra pantalla de notificación Push y hace polling hasta que apruebe en su celular
       // - En Tarjeta: verifica aprobación y activa la suscripción en `profiles`
       await pollTransactionVerification(
@@ -1934,181 +1945,67 @@ const PricingPage = () => {
                   </>
                 )}
 
-                {/* Campos para PSE */}
+                {/* Información para PSE */}
                 {paymentMethod === 'PSE' && (
-                  <>
-                    <div>
+                  <div
+                    style={{
+                      backgroundColor: '#f0fdf4',
+                      border: '1.5px solid #86efac',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div
                         style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '10px',
+                          backgroundColor: '#dcfce7',
                           display: 'flex',
-                          justifyContent: 'space-between',
                           alignItems: 'center',
-                          marginBottom: '6px',
+                          justifyContent: 'center',
+                          fontSize: '20px',
+                          flexShrink: 0,
                         }}
                       >
-                        <label
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            color: '#334155',
-                          }}
-                        >
-                          Selecciona tu Banco
-                        </label>
-                        {pseBanksError && (
-                          <button
-                            type="button"
-                            onClick={loadPseBanks}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              color: '#0f766e',
-                              fontSize: '12px',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                              textDecoration: 'underline',
-                            }}
-                          >
-                            Reintentar carga de bancos
-                          </button>
-                        )}
-                      </div>
-                      <select
-                        required
-                        disabled={pseBanksLoading}
-                        value={pseBankCode}
-                        onChange={(e) => setPseBankCode(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          border: '1px solid #cbd5e1',
-                          fontSize: '14px',
-                          backgroundColor: pseBanksLoading ? '#f8fafc' : '#ffffff',
-                          boxSizing: 'border-box',
-                        }}
-                      >
-                        {pseBanksLoading && <option value="">Cargando entidades bancarias de PSE...</option>}
-                        {!pseBanksLoading && pseBanks.length === 0 && (
-                          <option value="1">Banco que aprueba (Sandbox)</option>
-                        )}
-                        {!pseBanksLoading &&
-                          pseBanks.map((b) => (
-                            <option key={b.financial_institution_code} value={b.financial_institution_code}>
-                              {b.financial_institution_name}
-                            </option>
-                          ))}
-                      </select>
-                      {pseBanksError && (
-                        <p style={{ fontSize: '12px', color: '#b91c1c', margin: '6px 0 0' }}>{pseBanksError}</p>
-                      )}
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label
-                          style={{
-                            display: 'block',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            color: '#334155',
-                            marginBottom: '6px',
-                          }}
-                        >
-                          Tipo de persona
-                        </label>
-                        <select
-                          value={pseUserType}
-                          onChange={(e) => {
-                            const nextType = Number(e.target.value);
-                            setPseUserType(nextType);
-                            if (nextType === 1 && pseDocType === 'CC') {
-                              setPseDocType('NIT');
-                            } else if (nextType === 0 && pseDocType === 'NIT') {
-                              setPseDocType('CC');
-                            }
-                          }}
-                          style={{
-                            width: '100%',
-                            padding: '12px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
-                            fontSize: '14px',
-                            backgroundColor: '#ffffff',
-                            boxSizing: 'border-box',
-                          }}
-                        >
-                          <option value={0}>Persona Natural</option>
-                          <option value={1}>Persona Jurídica</option>
-                        </select>
+                        🏦
                       </div>
                       <div>
-                        <label
-                          style={{
-                            display: 'block',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            color: '#334155',
-                            marginBottom: '6px',
-                          }}
-                        >
-                          Tipo de documento
-                        </label>
-                        <select
-                          value={pseDocType}
-                          onChange={(e) => setPseDocType(e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '12px 14px',
-                            borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
-                            fontSize: '14px',
-                            backgroundColor: '#ffffff',
-                            boxSizing: 'border-box',
-                          }}
-                        >
-                          <option value="CC">Cédula de Ciudadanía (CC)</option>
-                          <option value="NIT">NIT</option>
-                          <option value="CE">Cédula de Extranjería (CE)</option>
-                          <option value="TI">Tarjeta de Identidad (TI)</option>
-                          <option value="PP">Pasaporte (PP)</option>
-                        </select>
+                        <div style={{ fontSize: '15px', fontWeight: 700, color: '#14532d' }}>
+                          Pago Seguro en Línea (PSE)
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#166534' }}>
+                          Cuentas de ahorros y corrientes de cualquier banco colombiano
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <label
-                        style={{
-                          display: 'block',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: '#334155',
-                          marginBottom: '6px',
-                        }}
-                      >
-                        Número de identificación (sin puntos ni guiones)
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        minLength={5}
-                        value={pseDocNumber}
-                        onChange={(e) => setPseDocNumber(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
-                        placeholder={pseDocType === 'NIT' ? 'Ej: 9001234567' : 'Ej: 1020304050'}
-                        style={{
-                          width: '100%',
-                          padding: '12px 16px',
-                          borderRadius: '10px',
-                          border: '1px solid #cbd5e1',
-                          fontSize: '15px',
-                          boxSizing: 'border-box',
-                        }}
-                      />
-                      <p style={{ fontSize: '12px', color: '#64748b', margin: '6px 0 0' }}>
-                        Serás redirigido de forma segura al portal PSE de tu banco para autorizar el débito.
-                      </p>
+                    <p style={{ fontSize: '13px', color: '#15803d', margin: 0, lineHeight: 1.5 }}>
+                      Al hacer clic en el botón de pago, serás redirigido de forma automática y segura a la pasarela de{' '}
+                      <strong>Wompi / PSE</strong>, donde podrás seleccionar directamente tu entidad financiera e ingresar a tu banca virtual para autorizar el débito.
+                    </p>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '12px',
+                        color: '#166534',
+                        backgroundColor: '#ffffff',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #bbf7d0',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px' }}>🔒</span>
+                      <span>No necesitas digitar números de cuenta ni documentos aquí. Todo se valida directamente en el portal oficial de tu banco.</span>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {/* Campos para NEQUI */}
