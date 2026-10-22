@@ -125,10 +125,10 @@ export interface WompiMerchantAcceptance {
 }
 
 const getWompiApiUrl = () =>
-  (import.meta.env.VITE_WOMPI_API_URL || 'https://sandbox.wompi.co/v1').replace(/\/$/, '');
+  (import.meta.env.VITE_WOMPI_API_URL || 'https://production.wompi.co/v1').replace(/\/$/, '');
 
 const getWompiPublicKey = () =>
-  import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_test_Q5yDA9xoKdePzhSGeVe9HAez7HgGORGf';
+  import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_prod_CWN8gApSpo7FKjWRoX3Iuntw983TVF9Z';
 
 function extractErrorMessage(errBody: unknown, status: number): string {
   if (!errBody || typeof errBody !== 'object') {
