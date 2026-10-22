@@ -722,7 +722,7 @@ const PricingPage = () => {
                       <span style={{ color: '#00DC94', fontWeight: 800 }}>✓</span> 2 meses gratis en cualquier plan
                     </li>
                     <li style={{ fontSize: '13px', color: '#334155', display: 'flex', gap: '8px' }}>
-                      <span style={{ color: '#00DC94', fontWeight: 800 }}>✓</span> Cancela en cualquier momento sin penalidad
+                      <span style={{ color: '#00DC94', fontWeight: 800 }}>✓</span> Cancela en cualquier momento
                     </li>
                     <li style={{ fontSize: '13px', color: '#334155', display: 'flex', gap: '8px' }}>
                       <span style={{ color: '#00DC94', fontWeight: 800 }}>✓</span> Activación instantánea de tu cuenta
