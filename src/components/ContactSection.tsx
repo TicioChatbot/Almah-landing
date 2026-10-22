@@ -3,19 +3,14 @@ const ContactSection = () => {
 
 
   return (
-    <section id="contacto" style={{ backgroundColor: 'var(--off-white)', padding: 'var(--section-padding)' }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem' }}>
+    <section id="contacto" className="contact-section-wrapper">
+      <div className="container contact-section-grid">
         {/* Left Column */}
         <div>
-          <h2 style={{ 
-            fontSize: 'var(--font-size-heading-large)', 
-            color: 'var(--text-primary)', 
-            fontWeight: 700,
-            marginBottom: '2rem' 
-          }}>
+          <h2 className="contact-section-title">
             Contáctanos
           </h2>
-          <p style={{ fontSize: '20px', color: 'var(--text-muted)', marginBottom: '3rem', lineHeight: '1.5' }}>
+          <p className="contact-section-desc">
             Estamos aquí para ayudarte. Déjanos tus datos y nos pondremos en contacto contigo lo antes posible.
           </p>
           
@@ -32,18 +27,7 @@ const ContactSection = () => {
         </div>
 
         {/* Right Column - CTA Button */}
-        <div style={{ 
-          backgroundColor: 'var(--white)', 
-          padding: '4rem 3rem', 
-          borderRadius: '12px', 
-          border: '1px solid #E5E7EB',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
-        }}>
+        <div className="contact-section-card">
           <h3 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '1.5rem' }}>Hablemos de tu proyecto</h3>
           <p style={{ fontSize: '18px', color: 'var(--text-muted)', marginBottom: '2.5rem' }}>
             Completa nuestro formulario rápido y nos pondremos en contacto contigo.

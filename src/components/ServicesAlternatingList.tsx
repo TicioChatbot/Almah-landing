@@ -33,13 +33,7 @@ const ServicesAlternatingList = () => {
         {items.map((item, i) => {
           const isEven = i % 2 === 0;
           return (
-            <div key={i} style={{ 
-              display: 'flex', 
-              flexDirection: isEven ? 'row' : 'row-reverse', 
-              alignItems: 'center', 
-              gap: '6rem',
-              marginBottom: '100px'
-            }}>
+            <div key={i} className={`services-alternating-row ${isEven ? 'row-even' : 'row-odd'}`}>
               {/* Text Side */}
               <div style={{ flex: 1 }}>
                 <h2 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '1.5rem', color: '#1A1A1A' }}>
@@ -60,7 +54,8 @@ const ServicesAlternatingList = () => {
                 backgroundColor: '#F9FAFB', // Light gray background to fill empty space
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                width: '100%'
               }}>
                 <img 
                   src={item.image} 

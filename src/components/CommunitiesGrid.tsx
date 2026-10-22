@@ -19,45 +19,18 @@ const CommunitiesGrid = () => {
           marginBottom: '60px' 
         }}></div>
 
-        <h2 style={{ 
-          fontSize: '56px', 
-          textAlign: 'center', 
-          marginBottom: '80px',
-          color: '#8F7FEE',
-          fontWeight: 700,
-          lineHeight: '68px'
-        }}>
+        <h2 className="communities-section-title">
           Nuestras comunidades
         </h2>
       </div>
 
       {/* Grid Container with Pale Background */}
-      <div style={{ 
-        backgroundColor: '#F3F4F6', 
-        paddingBottom: '120px',
-        position: 'relative'
-      }}>
-        <div className="container" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(2, 1fr)', 
-          gap: '3rem',
-          marginTop: '-120px' // Overlap effect
-        }}>
+      <div className="communities-grid-wrapper">
+        <div className="container communities-cards-grid">
           {/* Hub de Privacidad */}
           <div 
-            className="premium-card" 
+            className="premium-card community-card-item" 
             onClick={() => navigate('/hub')}
-            style={{ 
-              padding: '2rem', 
-              border: '4px solid rgba(26, 26, 26, 0.1)', 
-              backgroundColor: 'var(--white)',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between'
-            }}
           >
             <div>
               <div style={{ 
@@ -75,11 +48,11 @@ const CommunitiesGrid = () => {
                 />
               </div>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '0.75rem' }}>
                 <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                   Hub de Privacidad
                 </h3>
-                <img src={logoHub} alt="Hub Logo" style={{ height: '40px', width: 'auto' }} />
+                <img src={logoHub} alt="Hub Logo" style={{ height: '40px', width: 'auto', flexShrink: 0 }} />
               </div>
               
               <p style={{ fontSize: '18px', color: '#374151', lineHeight: '26px', fontWeight: 400, margin: '0 0 24px' }}>
@@ -94,19 +67,8 @@ const CommunitiesGrid = () => {
 
           {/* Fintech School */}
           <div 
-            className="premium-card" 
+            className="premium-card community-card-item" 
             onClick={() => navigate('/fintech')}
-            style={{ 
-              padding: '2rem', 
-              border: '4px solid rgba(26, 26, 26, 0.1)', 
-              backgroundColor: 'var(--white)',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between'
-            }}
           >
             <div>
               <div style={{ 
@@ -124,11 +86,11 @@ const CommunitiesGrid = () => {
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '0.75rem' }}>
                 <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
                   Fintech School
                 </h3>
-                <img src={logoRcm} alt="RC&M Logo" style={{ height: '40px', width: 'auto' }} />
+                <img src={logoRcm} alt="RC&M Logo" style={{ height: '40px', width: 'auto', flexShrink: 0 }} />
               </div>
 
               <p style={{ fontSize: '18px', color: '#1F1F1F', lineHeight: '26px', fontWeight: 400, margin: '0 0 24px' }}>

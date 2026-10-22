@@ -1,10 +1,10 @@
 
 const AboutBottomCTA = () => {
   return (
-    <section style={{ padding: '100px 0', textAlign: 'center' }}>
+    <section style={{ padding: '80px 0', textAlign: 'center' }}>
       <div className="container">
         <h2 style={{ 
-          fontSize: '44px', 
+          fontSize: 'clamp(28px, 4vw, 44px)', 
           fontWeight: 700, 
           color: '#1A1A1A', 
           marginBottom: '1.5rem',
@@ -13,11 +13,11 @@ const AboutBottomCTA = () => {
           Impulsa tu carrera con profesionales que te entienden
         </h2>
         <p style={{ 
-          fontSize: '18px', 
+          fontSize: 'clamp(16px, 2vw, 18px)', 
           color: '#4B5563', 
-          marginBottom: '3rem',
+          marginBottom: '2.5rem',
           maxWidth: '800px',
-          margin: '0 auto 3rem'
+          margin: '0 auto 2.5rem'
         }}>
           Conecta, comparte y aprende con profesionales de tu misma especialidad
         </p>
@@ -26,12 +26,13 @@ const AboutBottomCTA = () => {
           style={{ 
             backgroundColor: '#65628C', 
             color: 'var(--white)',
-            padding: '0.75rem 3rem',
-            fontSize: '20px',
+            padding: '0.75rem 2.5rem',
+            fontSize: '18px',
             fontWeight: 700,
             borderRadius: '100px',
             border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            maxWidth: '100%'
           }}
         >
           Únete a Almah

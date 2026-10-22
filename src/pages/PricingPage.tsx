@@ -151,7 +151,7 @@ const PricingPage = () => {
   const [password, setPassword] = useState('');
   const [avatarUrl] = useState(presetAvatars[0]);
   const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState<{ id?: string; email: string; full_name?: string } | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<{ id?: string; email: string; full_name?: string; access_token?: string } | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Datos de Tarjeta
@@ -276,6 +276,7 @@ const PricingPage = () => {
         id: loginRes.user?.id,
         email: loginRes.email || email.trim(),
         full_name: loginRes.user?.full_name,
+        access_token: loginRes.access_token,
       });
       if (loginRes.user?.full_name && !cardHolder) {
         setCardHolder(loginRes.user.full_name);
@@ -345,48 +346,75 @@ const PricingPage = () => {
         card_holder: cardHolder.trim(),
       });
 
-      // 3. Inscribir la suscripción con 2 meses gratis (Trial)
-      setProcessingMessage('Inscribiendo tarjeta e iniciando período de prueba (2 meses gratis)...');
-      await createWompiTrialSubscription(selectedInstance.backendUrl, {
-        subscription_type: selectedPlan.id,
-        subscription_duration: subscriptionDuration,
-        customer_email: userEmail,
-        acceptance_token: acceptance.acceptance_token,
-        accept_personal_auth: acceptance.accept_personal_auth,
-        card_token: cardToken,
-        token: cardToken,
-        installments: Number(installments) || 1,
-        trial_months: 2,
-        payment_source: {
-          type: 'CARD',
-          token: cardToken,
-          installments: Number(installments) || 1,
-        },
-      });
-
-      // 4. SOLO tras respuesta exitosa de la suscripción, se crea el usuario si era nuevo
+      // 3. Autenticación previa: Si es nuevo usuario, registrar e iniciar sesión para obtener el token
+      let userToken = loggedInUser?.access_token;
       if (authMode === 'signup') {
-        setProcessingMessage('¡Suscripción confirmada! Creando tu cuenta de usuario...');
-        const signupRes = await signupUser(selectedInstance.backendUrl, {
-          email: userEmail,
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              username: username.trim(),
-              avatar_url: avatarUrl,
+        setProcessingMessage('Creando tu cuenta de usuario...');
+        let signupRes;
+        try {
+          signupRes = await signupUser(selectedInstance.backendUrl, {
+            email: userEmail,
+            password,
+            options: {
+              data: {
+                full_name: fullName.trim(),
+                username: username.trim(),
+                avatar_url: avatarUrl,
+              },
             },
-          },
-        });
+          });
+          if (signupRes.access_token) {
+            userToken = signupRes.access_token;
+          }
+        } catch (signupErr: unknown) {
+          // Si el usuario ya existe, intentamos iniciar sesión con la contraseña provista
+          const errText = signupErr instanceof Error ? signupErr.message : '';
+          if (errText.includes('ya se encuentra registrado') || errText.includes('already registered')) {
+            // Intentar login
+          } else {
+            throw signupErr;
+          }
+        }
 
-        if (!signupRes.access_token) {
+        if (!userToken) {
           try {
-            await loginUser(selectedInstance.backendUrl, userEmail, password);
-          } catch {
+            const loginRes = await loginUser(selectedInstance.backendUrl, userEmail, password);
+            userToken = loginRes.access_token;
+            setLoggedInUser({
+              id: loginRes.user?.id,
+              email: loginRes.email || userEmail,
+              full_name: loginRes.user?.full_name,
+              access_token: loginRes.access_token,
+            });
+          } catch (loginErr) {
+            console.warn('No se pudo autenticar inmediatamente tras signup:', loginErr);
             setPendingEmailVerification(true);
           }
         }
       }
+
+      // 4. Inscribir la suscripción con 2 meses gratis (Trial) autenticado en el backend
+      setProcessingMessage('Inscribiendo tarjeta e iniciando período de prueba (2 meses gratis)...');
+      await createWompiTrialSubscription(
+        selectedInstance.backendUrl,
+        {
+          subscription_type: selectedPlan.id,
+          subscription_duration: subscriptionDuration,
+          customer_email: userEmail,
+          acceptance_token: acceptance.acceptance_token,
+          accept_personal_auth: acceptance.accept_personal_auth,
+          card_token: cardToken,
+          token: cardToken,
+          installments: Number(installments) || 1,
+          trial_months: 2,
+          payment_source: {
+            type: 'CARD',
+            token: cardToken,
+            installments: Number(installments) || 1,
+          },
+        },
+        userToken
+      );
 
       setSuccessInfo({
         email: userEmail,
@@ -410,14 +438,14 @@ const PricingPage = () => {
     <div
       style={{
         minHeight: '100vh',
-        paddingTop: '130px',
-        paddingBottom: '100px',
+        paddingTop: 'clamp(90px, 12vw, 130px)',
+        paddingBottom: '80px',
         fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         backgroundColor: '#f8fafc',
         color: '#0f172a',
       }}
     >
-      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: '1160px', margin: '0 auto', padding: '0 16px' }}>
         {/* Stepper Superior */}
         <div
           style={{
@@ -1240,7 +1268,7 @@ const PricingPage = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: '24px',
                 alignItems: 'start',
               }}

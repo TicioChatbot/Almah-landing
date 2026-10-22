@@ -2,9 +2,9 @@ import logo from '../assets/logo-high.png';
 
 const DetailedFooter = () => {
   return (
-    <footer style={{ backgroundColor: 'var(--dark-bg)', color: 'var(--white)', padding: '80px 0 40px' }}>
+    <footer className="footer-wrapper">
       <div className="container">
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '4rem', marginBottom: '4rem' }}>
+        <div className="footer-grid">
           {/* Logo & Info */}
           <div>
             <img src={logo} alt="Almah Logo" style={{ height: '70px', width: 'auto', marginBottom: '1.5rem' }} />
@@ -48,7 +48,7 @@ const DetailedFooter = () => {
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid #2A2A2A', paddingTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', color: '#666' }}>
+        <div className="footer-bottom-bar">
           <p>© {new Date().getFullYear()} ALMAH. Todos los derechos reservados.</p>
           <div style={{ display: 'flex', gap: '2rem' }}>
           </div>

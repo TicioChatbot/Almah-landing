@@ -467,7 +467,8 @@ export interface WompiTrialSubscriptionResponse {
  */
 export async function createWompiTrialSubscription(
   backendUrl: string,
-  payload: CreateWompiTrialSubscriptionRequest
+  payload: CreateWompiTrialSubscriptionRequest,
+  accessToken?: string
 ): Promise<WompiTrialSubscriptionResponse> {
   const baseUrl = backendUrl.replace(/\/$/, '');
 
@@ -484,11 +485,16 @@ export async function createWompiTrialSubscription(
     installments: payload.installments || payload.payment_source?.installments || 1,
   };
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
   const res = await fetch(baseUrl + '/wompi/subscriptions/trial', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(requestBody),
   });
 

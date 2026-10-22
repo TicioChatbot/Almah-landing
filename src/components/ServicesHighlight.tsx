@@ -9,26 +9,13 @@ const ServicesHighlight = () => {
   ];
 
   return (
-    <section style={{ backgroundColor: '#BFB3F3', padding: '60px 0 100px' }}>
+    <section className="services-highlight-section">
       <div className="container">
         {/* Service Titles Bar */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(4, 1fr)', 
-          gap: '1rem', 
-          textAlign: 'center',
-          marginBottom: '40px' 
-        }}>
+        <div className="services-highlight-grid">
           {services.map((service, i) => (
             <div key={i} style={{ padding: '0 10px' }}>
-              <h4 style={{ 
-                fontSize: '18px', 
-                lineHeight: '22px', 
-                color: 'var(--white)',
-                fontWeight: 700,
-                textAlign: 'center',
-                margin: 0
-              }}>
+              <h4 className="services-highlight-item-title">
                 {service.title}
               </h4>
             </div>
@@ -36,17 +23,7 @@ const ServicesHighlight = () => {
         </div>
         
         {/* Main Banner Video */}
-        <div style={{ 
-          width: '100%', 
-          backgroundColor: '#000', 
-          border: '12px solid rgba(255, 255, 255, 0.3)', 
-          borderRadius: '12px',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-        }}>
+        <div className="services-highlight-video-wrapper">
           <video
             autoPlay
             muted

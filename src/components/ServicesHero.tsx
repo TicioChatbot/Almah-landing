@@ -1,11 +1,11 @@
 
 const ServicesHero = () => {
   return (
-    <section className="container" style={{ padding: '160px 0 60px', textAlign: 'center' }}>
+    <section className="container" style={{ padding: 'clamp(100px, 12vw, 160px) 0 40px', textAlign: 'center' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <h1 style={{ 
-          fontSize: '44px', 
-          lineHeight: '1.2', 
+          fontSize: 'clamp(26px, 4vw, 44px)', 
+          lineHeight: '1.25', 
           fontWeight: 700,
           color: '#1A1A1A'
         }}>

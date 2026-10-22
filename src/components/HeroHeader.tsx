@@ -1,32 +1,23 @@
 const HeroHeader = () => {
   return (
-    <section className="container" style={{ padding: '10rem 0 4rem', textAlign: 'center' }}>
+    <section className="container hero-header-section">
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ 
-          fontSize: 'var(--font-size-hero)', 
-          lineHeight: '1.2', 
-          marginBottom: '3rem',
-          fontWeight: 700,
-          color: 'var(--text-black)'
-        }}>
+        <h1 className="hero-header-title">
           <span style={{ color: 'var(--mint-green)' }}>Almah redefine la experiencia jurídica.</span>
           <br />
           Networking, formación e inteligencia artificial en una plataforma integral creada para profesionales en crecimiento
         </h1>
-        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', marginTop: '3rem' }}>
+        <div className="hero-header-buttons">
           <button 
             onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
-            className="btn-primary" 
-            style={{ padding: '1rem 2.5rem', fontSize: '1.1rem' }}
+            className="btn-primary hero-btn"
           >
             Explorar Comunidades
           </button>
           <button 
             onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
-            className="btn-secondary" 
+            className="btn-secondary hero-btn"
             style={{ 
-              padding: '1rem 2.5rem', 
-              fontSize: '1.1rem',
               color: 'var(--text-black)',
               borderColor: 'var(--text-black)' 
             }}

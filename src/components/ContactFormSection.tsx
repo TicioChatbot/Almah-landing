@@ -17,25 +17,14 @@ const ContactFormSection = () => {
 
 
   return (
-    <section style={{ padding: '60px 0' }}>
-      <div className="container" style={{ display: 'flex', gap: '4rem', alignItems: 'flex-start' }}>
+    <section className="contact-form-section">
+      <div className="container contact-form-container">
         {/* Contact CTA Info */}
-        <div style={{ flex: 1, paddingTop: '2rem' }}>
-          <h2 style={{ 
-            fontSize: '44px', 
-            fontWeight: 700, 
-            marginBottom: '1.5rem', 
-            color: 'var(--text-black)',
-            lineHeight: '1.1'
-          }}>
+        <div style={{ flex: 1, paddingTop: '1rem' }}>
+          <h2 className="contact-form-title">
             ¿Listo para llevar tu comunidad al <span style={{ color: 'var(--lilac)' }}>siguiente nivel?</span>
           </h2>
-          <p style={{ 
-            fontSize: '20px', 
-            color: 'var(--text-muted)', 
-            marginBottom: '3rem',
-            lineHeight: '1.5'
-          }}>
+          <p className="contact-form-desc">
             Haz clic en el botón de abajo para completar nuestro formulario de contacto en Google Forms y nos comunicaremos contigo lo antes posible.
           </p>
           
@@ -43,8 +32,8 @@ const ContactFormSection = () => {
             onClick={() => window.open(googleFormUrl, '_blank')}
             className="btn-primary" 
             style={{ 
-              padding: '1.5rem 3rem', 
-              fontSize: '20px', 
+              padding: '1.25rem 2rem', 
+              fontSize: '18px', 
               width: '100%',
               textAlign: 'center'
             }}
@@ -52,7 +41,7 @@ const ContactFormSection = () => {
             Ir al formulario de contacto
           </button>
 
-          <div style={{ marginTop: '3rem', display: 'flex', gap: '3rem' }}>
+          <div className="contact-form-info-row">
             <div>
               <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--lilac)', marginBottom: '0.5rem' }}>Email</div>
               <div style={{ fontSize: '16px' }}>Almah@redek.co</div>
@@ -65,7 +54,7 @@ const ContactFormSection = () => {
         </div>
 
         {/* Image Carousel */}
-        <div style={{ flex: 1.2 }}>
+        <div className="contact-form-carousel-col">
           <div style={{ 
             width: '100%', 
             aspectRatio: '1/1',
@@ -95,7 +84,7 @@ const ContactFormSection = () => {
           <p style={{ 
             marginTop: '1.5rem', 
             textAlign: 'center', 
-            fontSize: '20px', 
+            fontSize: '18px', 
             fontWeight: 500, 
             color: 'var(--text-muted)' 
           }}>

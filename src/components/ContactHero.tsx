@@ -1,17 +1,18 @@
 
 const ContactHero = () => {
   return (
-    <section className="container" style={{ padding: '160px 0 60px', textAlign: 'center' }}>
+    <section className="container" style={{ padding: 'clamp(100px, 12vw, 160px) 0 40px', textAlign: 'center' }}>
       <h1 style={{ 
-        fontSize: '56px', 
+        fontSize: 'clamp(32px, 5vw, 56px)', 
         fontWeight: 700, 
         color: '#1A1A1A', 
-        marginBottom: '1rem' 
+        marginBottom: '1rem',
+        lineHeight: 1.2
       }}>
         Únete a Almah
       </h1>
       <p style={{ 
-        fontSize: '24px', 
+        fontSize: 'clamp(17px, 2.5vw, 24px)', 
         color: 'var(--mint-green)', 
         maxWidth: '700px', 
         margin: '0 auto',

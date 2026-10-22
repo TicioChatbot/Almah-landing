@@ -15,21 +15,21 @@ const ServicesBottomCTA = () => {
   }, [images.length]);
 
   return (
-    <section style={{ backgroundColor: '#BFB3F3', padding: '100px 0' }}>
+    <section style={{ backgroundColor: '#BFB3F3', padding: 'clamp(50px, 8vw, 100px) 0' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <h2 style={{ fontSize: '44px', fontWeight: 700, color: 'var(--white)', marginBottom: '1.5rem', lineHeight: '1.2' }}>
-            Lleva tu carrera al siguiente nivel rodeado de <br /> quienes entienden tu mundo.
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 700, color: 'var(--white)', marginBottom: '1.25rem', lineHeight: '1.2' }}>
+            Lleva tu carrera al siguiente nivel rodeado de <br className="hidden sm:inline" /> quienes entienden tu mundo.
           </h2>
-          <p style={{ fontSize: '18px', color: 'var(--white)', marginBottom: '3rem', opacity: 0.9 }}>
-            En Almah te ofrecemos una red de apoyo y herramientas para que <br /> tú y tu equipo se conviertan en aliados estratégicos.
+          <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', color: 'var(--white)', marginBottom: '2.5rem', opacity: 0.9 }}>
+            En Almah te ofrecemos una red de apoyo y herramientas para que <br className="hidden sm:inline" /> tú y tu equipo se conviertan en aliados estratégicos.
           </p>
           <button 
             onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
             className="btn-secondary" 
             style={{ 
-              padding: '1rem 3rem',
-              fontSize: '20px',
+              padding: '0.85rem 2.5rem',
+              fontSize: '18px',
               width: 'auto',
               cursor: 'pointer'
             }}
@@ -38,16 +38,16 @@ const ServicesBottomCTA = () => {
           </button>
         </div>
 
-        {/* Carousel replaces Video Placeholder */}
+        {/* Carousel */}
         <div style={{ 
           maxWidth: '1000px', 
           margin: '0 auto', 
           position: 'relative',
-          aspectRatio: '16/7', 
+          aspectRatio: '16/9', 
           borderRadius: '12px',
           overflow: 'hidden',
           boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-          border: '12px solid rgba(255, 255, 255, 0.3)'
+          border: '6px solid rgba(255, 255, 255, 0.3)'
         }}>
           {images.map((img, idx) => (
             <img 

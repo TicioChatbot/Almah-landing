@@ -42,11 +42,7 @@ const AboutTeam = () => {
           Presentamos a las personas que hay detrás de Almah
         </p>
 
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(4, 1fr)', 
-          gap: '2.5rem' 
-        }}>
+        <div className="about-team-grid">
           {team.map((member, i) => (
             <div key={i} style={{ textAlign: 'left' }}>
               <div style={{ 
