@@ -165,6 +165,8 @@ const PricingPage = () => {
   const [merchantAcceptance, setMerchantAcceptance] = useState<WompiMerchantAcceptance | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPersonalData, setAcceptedPersonalData] = useState(false);
+  const [showDataAuthModal, setShowDataAuthModal] = useState(false);
+  const [isDataAuthExpanded, setIsDataAuthExpanded] = useState(false);
 
   // Estados de proceso
   const [isProcessing, setIsProcessing] = useState(false);
@@ -322,7 +324,7 @@ const PricingPage = () => {
     }
 
     if (!acceptedTerms || !acceptedPersonalData) {
-      setErrorMessage('Debes aceptar los términos y condiciones y la autorización de datos personales.');
+      setErrorMessage('Debes aceptar los términos y condiciones de Wompi y la autorización para el tratamiento de datos personales.');
       return;
     }
 
@@ -1706,38 +1708,121 @@ const PricingPage = () => {
                           style={{ marginTop: '2px' }}
                         />
                         <span>
-                          Acepto el{' '}
+                          Acepto los{' '}
+                          <a
+                            href="/legal/terminos-y-condiciones.pdf"
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: '#0f766e', fontWeight: 600, textDecoration: 'underline' }}
+                          >
+                            Términos y Condiciones de Almah
+                          </a>{' '}
+                          y el{' '}
                           <a
                             href={merchantAcceptance?.terms_permalink || 'https://wompi.com/es/co/reglamento-usuarios-colombia'}
                             target="_blank"
                             rel="noreferrer"
-                            style={{ color: '#0f766e', fontWeight: 600 }}
+                            style={{ color: '#0f766e', fontWeight: 600, textDecoration: 'underline' }}
                           >
-                            reglamento y términos de Wompi
+                            reglamento de Wompi
                           </a>{' '}
                           para la inscripción de mi tarjeta.
                         </span>
                       </label>
 
-                      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={acceptedPersonalData}
-                          onChange={(e) => setAcceptedPersonalData(e.target.checked)}
-                          style={{ marginTop: '2px' }}
-                        />
-                        <span>
-                          Autorizo la{' '}
-                          <a
-                            href={merchantAcceptance?.personal_data_permalink || 'https://wompi.com/es/co/autorizacion-administracion-datos-personales'}
-                            target="_blank"
-                            rel="noreferrer"
-                            style={{ color: '#0f766e', fontWeight: 600 }}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={acceptedPersonalData}
+                            onChange={(e) => setAcceptedPersonalData(e.target.checked)}
+                            style={{ marginTop: '2px' }}
+                          />
+                          <span>
+                            Autorizo de manera previa, expresa e informada el{' '}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowDataAuthModal(true);
+                              }}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                color: '#0f766e',
+                                fontWeight: 700,
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                fontSize: 'inherit',
+                                fontFamily: 'inherit',
+                                display: 'inline'
+                              }}
+                            >
+                              tratamiento de mis datos personales
+                            </button>{' '}
+                            en el marco del Hub de Privacidad.{' '}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsDataAuthExpanded(!isDataAuthExpanded);
+                              }}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                color: '#64748b',
+                                fontSize: '11px',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                display: 'inline',
+                                marginLeft: '4px'
+                              }}
+                            >
+                              {isDataAuthExpanded ? '(Ocultar texto ▲)' : '(Ver texto completo ▼)'}
+                            </button>
+                          </span>
+                        </label>
+
+                        {/* Caja desplegable en el formulario */}
+                        {isDataAuthExpanded && (
+                          <div
+                            style={{
+                              marginTop: '6px',
+                              padding: '12px 14px',
+                              backgroundColor: '#f8fafc',
+                              border: '1px solid #cbd5e1',
+                              borderRadius: '8px',
+                              fontSize: '11px',
+                              lineHeight: '1.6',
+                              color: '#334155',
+                              maxHeight: '220px',
+                              overflowY: 'auto'
+                            }}
                           >
-                            administración y tratamiento de datos personales
-                          </a>.
-                        </span>
-                      </label>
+                            <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '8px', fontSize: '12px' }}>
+                              Autorización para el tratamiento de datos personales
+                            </div>
+                            <p style={{ margin: '0 0 10px 0' }}>
+                              Al diligenciar este formulario, usted autoriza de manera libre, previa, expresa e informada a <strong>Teclegal S.A.S.</strong>, sociedad constituida bajo las leyes de la República de Colombia, identificada con NIT 901.583.022-1, domiciliada en Bogotá D.C., con dirección en Calle 94 BIS 49A-30 La Castellana, Bogotá D.C., correo electrónico <a href="mailto:nico@redek.co" style={{ color: '#0f766e', fontWeight: 600 }}>nico@redek.co</a>, teléfono <a href="tel:3176566432" style={{ color: '#0f766e', fontWeight: 600 }}>3176566432</a>; a <strong>Escuela de Privacidad S.A.S.</strong>, sociedad constituida bajo las leyes de la República de Colombia, identificada con NIT 900.994.943-1, domiciliada en Bogotá D.C., con dirección en Avenida Calle 26 No. 69-76, correo electrónico <a href="mailto:contacto@escueladeprivacidad.com" style={{ color: '#0f766e', fontWeight: 600 }}>contacto@escueladeprivacidad.com</a>, teléfono <a href="tel:6014898687" style={{ color: '#0f766e', fontWeight: 600 }}>601 489 86 87</a>; y a <strong>Nathalia Ana María Rivera Perdomo</strong>, identificada con cédula de ciudadanía 1.075.286.293, domiciliada en Neiva (Huila), con dirección en Calle 56 No. 1 W-99, correo electrónico <a href="mailto:ceo@agilempresarial.com" style={{ color: '#0f766e', fontWeight: 600 }}>ceo@agilempresarial.com</a>, teléfono <a href="tel:3158158707" style={{ color: '#0f766e', fontWeight: 600 }}>3158158707</a>; quienes actúan conjuntamente como responsables del tratamiento en el marco del Hub de Privacidad, para recolectar y tratar sus datos personales para las siguientes finalidades: gestionar su registro e inscripción en la plataforma o lista de espera del Hub de Privacidad; enviarle información sobre el lanzamiento, planes de membresía y novedades; y contactarle para la activación de su cuenta.
+                            </p>
+                            <p style={{ margin: '0 0 10px 0' }}>
+                              Sus datos serán tratados conforme a la Política de Tratamiento de Datos Personales del Hub de Privacidad, disponible en <a href="https://hubprivacidad.com" target="_blank" rel="noreferrer" style={{ color: '#0f766e', fontWeight: 700 }}>hubprivacidad.com</a>. Usted podrá consultar la política individual de cada responsable en:
+                            </p>
+                            <ul style={{ margin: '0 0 10px 0', paddingLeft: '18px' }}>
+                              <li>Teclegal S.A.S. (Redek): <a href="https://redek.co" target="_blank" rel="noreferrer" style={{ color: '#0f766e', fontWeight: 600 }}>redek.co</a></li>
+                              <li>Escuela de Privacidad: <a href="https://escueladeprivacidad.co/politica-de-tratamiento-de-datos-personales" target="_blank" rel="noreferrer" style={{ color: '#0f766e', fontWeight: 600 }}>escueladeprivacidad.co/politica-de-tratamiento-de-datos-personales</a></li>
+                              <li>Ágil Empresarial: <a href="https://agilempresarial.com/politica-de-privacidad-3" target="_blank" rel="noreferrer" style={{ color: '#0f766e', fontWeight: 600 }}>agilempresarial.com/politica-de-privacidad-3</a></li>
+                            </ul>
+                            <p style={{ margin: 0 }}>
+                              En calidad de titular, usted tiene derecho a: (i) conocer, actualizar y rectificar sus datos personales frente a los responsables del tratamiento; (ii) solicitar prueba de la autorización otorgada, salvo cuando expresamente se exceptúe como requisito para el tratamiento; (iii) ser informado por el responsable del tratamiento o el encargado, previa solicitud, respecto del uso que les ha dado a sus datos personales; (iv) presentar ante la Superintendencia de Industria y Comercio quejas por infracciones a lo dispuesto en la Ley 1581 de 2012 y las demás normas que la modifiquen, adicionen o complementen; (v) revocar la autorización y/o solicitar la supresión del dato cuando en el tratamiento no se respeten los principios, derechos y garantías constitucionales y legales; y (vi) acceder en forma gratuita a sus datos personales que hayan sido objeto de tratamiento. El ejercicio de estos derechos podrá realizarse mediante solicitud dirigida a los respectivos canales establecidos en cada una de las Políticas de Tratamiento de Datos de los responsables del tratamiento.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <button
@@ -1985,6 +2070,156 @@ const PricingPage = () => {
           </div>
         )}
       </div>
+      {/* Modal flotante de Autorización para el tratamiento de datos personales */}
+      {showDataAuthModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+          onClick={() => setShowDataAuthModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              maxWidth: '680px',
+              width: '100%',
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#f8fafc'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '12px',
+                    backgroundColor: '#ecfdf5',
+                    color: '#059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px'
+                  }}
+                >
+                  🛡️
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
+                    Autorización para el tratamiento de datos personales
+                  </h3>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>Hub de Privacidad - Almah</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDataAuthModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  lineHeight: 1,
+                  padding: '4px'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div
+              style={{
+                padding: '24px',
+                overflowY: 'auto',
+                fontSize: '13px',
+                lineHeight: '1.7',
+                color: '#334155'
+              }}
+            >
+              <p style={{ marginTop: 0, marginBottom: '16px' }}>
+                Al diligenciar este formulario, usted autoriza de manera libre, previa, expresa e informada a <strong>Teclegal S.A.S.</strong>, sociedad constituida bajo las leyes de la República de Colombia, identificada con NIT 901.583.022-1, domiciliada en Bogotá D.C., con dirección en Calle 94 BIS 49A-30 La Castellana, Bogotá D.C., correo electrónico <a href="mailto:nico@redek.co" style={{ color: '#0f766e', fontWeight: 600 }}>nico@redek.co</a>, teléfono <a href="tel:3176566432" style={{ color: '#0f766e', fontWeight: 600 }}>3176566432</a>; a <strong>Escuela de Privacidad S.A.S.</strong>, sociedad constituida bajo las leyes de la República de Colombia, identificada con NIT 900.994.943-1, domiciliada en Bogotá D.C., con dirección en Avenida Calle 26 No. 69-76, correo electrónico <a href="mailto:contacto@escueladeprivacidad.com" style={{ color: '#0f766e', fontWeight: 600 }}>contacto@escueladeprivacidad.com</a>, teléfono <a href="tel:6014898687" style={{ color: '#0f766e', fontWeight: 600 }}>601 489 86 87</a>; y a <strong>Nathalia Ana María Rivera Perdomo</strong>, identificada con cédula de ciudadanía 1.075.286.293, domiciliada en Neiva (Huila), con dirección en Calle 56 No. 1 W-99, correo electrónico <a href="mailto:ceo@agilempresarial.com" style={{ color: '#0f766e', fontWeight: 600 }}>ceo@agilempresarial.com</a>, teléfono <a href="tel:3158158707" style={{ color: '#0f766e', fontWeight: 600 }}>3158158707</a>; quienes actúan conjuntamente como responsables del tratamiento en el marco del Hub de Privacidad, para recolectar y tratar sus datos personales para las siguientes finalidades: gestionar su registro e inscripción en la plataforma o lista de espera del Hub de Privacidad; enviarle información sobre el lanzamiento, planes de membresía y novedades; y contactarle para la activación de su cuenta.
+              </p>
+
+              <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
+                <p style={{ margin: '0 0 10px 0', fontWeight: 600, color: '#166534' }}>
+                  Sus datos serán tratados conforme a la Política de Tratamiento de Datos Personales del Hub de Privacidad, disponible en <a href="https://hubprivacidad.com" target="_blank" rel="noreferrer" style={{ color: '#0f766e', textDecoration: 'underline' }}>hubprivacidad.com</a> y en el documento oficial <a href="/legal/politica-de-privacidad.pdf" target="_blank" rel="noreferrer" style={{ color: '#0f766e', fontWeight: 700, textDecoration: 'underline' }}>Política de Privacidad y Tratamiento de Datos (PDF)</a>.
+                </p>
+                <div style={{ fontSize: '12px', color: '#15803d' }}>
+                  Usted podrá consultar la política individual de cada responsable en:
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '20px' }}>
+                    <li><strong>Teclegal S.A.S. (Redek):</strong> <a href="https://redek.co" target="_blank" rel="noreferrer" style={{ color: '#0f766e', textDecoration: 'underline' }}>redek.co</a></li>
+                    <li><strong>Escuela de Privacidad:</strong> <a href="https://escueladeprivacidad.co/politica-de-tratamiento-de-datos-personales" target="_blank" rel="noreferrer" style={{ color: '#0f766e', textDecoration: 'underline' }}>escueladeprivacidad.co/politica-de-tratamiento-de-datos-personales</a></li>
+                    <li><strong>Ágil Empresarial:</strong> <a href="https://agilempresarial.com/politica-de-privacidad-3" target="_blank" rel="noreferrer" style={{ color: '#0f766e', textDecoration: 'underline' }}>agilempresarial.com/politica-de-privacidad-3</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <p style={{ marginBottom: 0 }}>
+                En calidad de titular, usted tiene derecho a: (i) conocer, actualizar y rectificar sus datos personales frente a los responsables del tratamiento; (ii) solicitar prueba de la autorización otorgada, salvo cuando expresamente se exceptúe como requisito para el tratamiento; (iii) ser informado por el responsable del tratamiento o el encargado, previa solicitud, respecto del uso que les ha dado a sus datos personales; (iv) presentar ante la Superintendencia de Industria y Comercio quejas por infracciones a lo dispuesto en la Ley 1581 de 2012 y las demás normas que la modifiquen, adicionen o complementen; (v) revocar la autorización y/o solicitar la supresión del dato cuando en el tratamiento no se respeten los principios, derechos y garantías constitucionales y legales; y (vi) acceder en forma gratuita a sus datos personales que hayan sido objeto de tratamiento. El ejercicio de estos derechos podrá realizarse mediante solicitud dirigida a los respectivos canales establecidos en cada una de las Políticas de Tratamiento de Datos de los responsables del tratamiento.
+              </p>
+            </div>
+
+            <div
+              style={{
+                padding: '16px 24px',
+                borderTop: '1px solid #e2e8f0',
+                backgroundColor: '#f8fafc',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '12px'
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setAcceptedPersonalData(true);
+                  setShowDataAuthModal(false);
+                }}
+                style={{
+                  padding: '10px 22px',
+                  backgroundColor: '#00DC94',
+                  color: '#042f2e',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0, 220, 148, 0.3)'
+                }}
+              >
+                Aceptar autorización
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

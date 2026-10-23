@@ -1,5 +1,4 @@
 import Image from "@/components/ui/Image";
-import { Link } from "react-router-dom";
 import { Container } from "@/components/ui/Section";
 import { LEGAL_LINKS, SITE } from "@/config/site";
 
@@ -66,12 +65,14 @@ export function SiteFooter() {
             <ul className="flex flex-col gap-2">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link-underline text-ink-soft/80 transition-colors duration-(--duration-fast) hover:text-navy"
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

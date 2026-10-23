@@ -19,6 +19,6 @@ export const SITE = {
 } as const;
 
 export const LEGAL_LINKS = [
-  { label: "Política de privacidad", href: "/privacidad" },
-  { label: "Términos y condiciones", href: "/terminos" },
+  { label: "Política de privacidad", href: "/legal/politica-de-privacidad.pdf" },
+  { label: "Términos y condiciones", href: "/legal/terminos-y-condiciones.pdf" },
 ] as const;

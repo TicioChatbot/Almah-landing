@@ -41,9 +41,9 @@ const DetailedFooter = () => {
           <div>
             <h4 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '1.5rem' }}>Legales</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '14px', color: '#666' }}>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Términos y condiciones</a>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Política de privacidad</a>
-              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Política de cookies</a>
+              <a href="/legal/terminos-y-condiciones.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Términos y condiciones</a>
+              <a href="/legal/politica-de-privacidad.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Política de privacidad</a>
+              <a href="/legal/politica-de-privacidad.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Política de cookies</a>
             </div>
           </div>
         </div>
