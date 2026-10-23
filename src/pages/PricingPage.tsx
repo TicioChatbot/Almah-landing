@@ -165,6 +165,7 @@ const PricingPage = () => {
   const [merchantAcceptance, setMerchantAcceptance] = useState<WompiMerchantAcceptance | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPersonalData, setAcceptedPersonalData] = useState(false);
+  const [dataTreatmentAcceptedAt, setDataTreatmentAcceptedAt] = useState<string | null>(null);
   const [showDataAuthModal, setShowDataAuthModal] = useState(false);
   const [isDataAuthExpanded, setIsDataAuthExpanded] = useState(false);
 
@@ -297,6 +298,7 @@ const PricingPage = () => {
     setErrorMessage(null);
 
     const userEmail = (loggedInUser?.email || email).trim();
+    const consentTimestamp = dataTreatmentAcceptedAt || new Date().toISOString();
 
     if (authMode === 'signup' && (!fullName.trim() || !username.trim())) {
       setErrorMessage('Por favor completa tu nombre y nombre de usuario.');
@@ -362,6 +364,9 @@ const PricingPage = () => {
                 full_name: fullName.trim(),
                 username: username.trim(),
                 avatar_url: avatarUrl,
+                data_treatment_accepted: true,
+                data_treatment_accepted_at: consentTimestamp,
+                data_treatment_version: '2026-10-23-hub-privacidad-v1',
               },
             },
           });
@@ -409,6 +414,9 @@ const PricingPage = () => {
           token: cardToken,
           installments: Number(installments) || 1,
           trial_months: 2,
+          data_treatment_accepted: true,
+          data_treatment_accepted_at: consentTimestamp,
+          data_treatment_version: '2026-10-23-hub-privacidad-v1',
           payment_source: {
             type: 'CARD',
             token: cardToken,
@@ -1735,7 +1743,14 @@ const PricingPage = () => {
                           <input
                             type="checkbox"
                             checked={acceptedPersonalData}
-                            onChange={(e) => setAcceptedPersonalData(e.target.checked)}
+                            onChange={(e) => {
+                              setAcceptedPersonalData(e.target.checked);
+                              if (e.target.checked) {
+                                setDataTreatmentAcceptedAt(new Date().toISOString());
+                              } else {
+                                setDataTreatmentAcceptedAt(null);
+                              }
+                            }}
                             style={{ marginTop: '2px' }}
                           />
                           <span>
@@ -2200,6 +2215,7 @@ const PricingPage = () => {
                 type="button"
                 onClick={() => {
                   setAcceptedPersonalData(true);
+                  setDataTreatmentAcceptedAt(new Date().toISOString());
                   setShowDataAuthModal(false);
                 }}
                 style={{

@@ -8,6 +8,10 @@ export interface SignupPayload {
       full_name: string;
       username: string;
       avatar_url?: string;
+      data_treatment_accepted?: boolean;
+      data_treatment_accepted_at?: string;
+      data_treatment_version?: string;
+      [key: string]: unknown;
     };
   };
 }
@@ -449,6 +453,9 @@ export interface CreateWompiTrialSubscriptionRequest {
   token?: string;
   installments?: number;
   trial_months?: number;
+  data_treatment_accepted?: boolean;
+  data_treatment_accepted_at?: string;
+  data_treatment_version?: string;
   metadata?: Record<string, unknown>;
 }
 
