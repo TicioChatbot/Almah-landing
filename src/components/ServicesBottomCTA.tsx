@@ -25,7 +25,7 @@ const ServicesBottomCTA = () => {
             En Almah te ofrecemos una red de apoyo y herramientas para que <br className="hidden sm:inline" /> tú y tu equipo se conviertan en aliados estratégicos.
           </p>
           <button 
-            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
             className="btn-secondary" 
             style={{ 
               padding: '0.85rem 2.5rem',

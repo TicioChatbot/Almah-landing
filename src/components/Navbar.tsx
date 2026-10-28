@@ -31,7 +31,7 @@ const Navbar = () => {
           <a href="https://fintech.almah.ai" style={{ color: 'var(--white)', fontWeight: 700, textDecoration: 'none', fontSize: 'var(--font-size-nav)' }}>Iniciar sesión</a>
           
           <button 
-            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
             style={{ 
               backgroundColor: 'var(--white)', 
               color: 'var(--text-black)',
@@ -95,7 +95,7 @@ const Navbar = () => {
             <button 
               onClick={() => {
                 closeMenu();
-                window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA';
+                window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header';
               }}
               className="btn-primary"
               style={{

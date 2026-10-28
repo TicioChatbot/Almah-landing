@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import logoRcm from '../assets/logo-rcm.png';
 import logoHub from '../assets/logo-hub.png';
 import {
@@ -127,8 +126,13 @@ const presetAvatars = [
 
 const STORAGE_KEY = 'almah_checkout_session';
 
+const OTHER_PAYMENT_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSfff-sK04rQ_LiEQtlqvMGIzamr1xjiNn05iKJVWV9Snskbaw/viewform?usp=publish-editor';
+
 const PricingPage = () => {
-  const navigate = useNavigate();
+  const handleRedirectToOtherPayments = () => {
+    window.location.href = OTHER_PAYMENT_FORM_URL;
+  };
 
   // Paso 1: Instancia
   // Paso 2: Tipo de Licencia (Personal vs Corporativa)
@@ -838,7 +842,7 @@ const PricingPage = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSelectLicenseType('CORPORATE');
+                    handleRedirectToOtherPayments();
                   }}
                   style={{
                     width: '100%',
@@ -879,7 +883,7 @@ const PricingPage = () => {
 
                   <button
                     type="button"
-                    onClick={() => navigate('/contacto')}
+                    onClick={handleRedirectToOtherPayments}
                     style={{
                       padding: '14px 32px',
                       borderRadius: '12px',
@@ -949,7 +953,7 @@ const PricingPage = () => {
 
                       <button
                         type="button"
-                        onClick={() => navigate('/contacto')}
+                        onClick={handleRedirectToOtherPayments}
                         style={{
                           marginTop: '20px',
                           width: '100%',
@@ -1258,6 +1262,24 @@ const PricingPage = () => {
                 }}
               >
                 Continuar
+              </button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '24px' }}>
+              <button
+                type="button"
+                onClick={handleRedirectToOtherPayments}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#64748b',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  fontWeight: 500,
+                }}
+              >
+                ¿Buscas otros medios de pago (transferencia, PSE o factura corporativa)? Haz clic aquí
               </button>
             </div>
           </div>
@@ -1878,6 +1900,24 @@ const PricingPage = () => {
                         <span>Continuar</span>
                       )}
                     </button>
+
+                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={handleRedirectToOtherPayments}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#64748b',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          fontWeight: 500,
+                        }}
+                      >
+                        ¿Prefieres pagar por otros medios de pago? Diligencia el formulario aquí
+                      </button>
+                    </div>
                   </>
                 )}
               </form>

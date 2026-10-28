@@ -9,13 +9,13 @@ const HeroHeader = () => {
         </h1>
         <div className="hero-header-buttons">
           <button 
-            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
             className="btn-primary hero-btn"
           >
             Explorar Comunidades
           </button>
           <button 
-            onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+            onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
             className="btn-secondary hero-btn"
             style={{ 
               color: 'var(--text-black)',

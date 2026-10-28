@@ -24,7 +24,7 @@ const Communities = () => {
             <h3 style={{ marginBottom: '1rem', color: 'var(--secondary)' }}>{comm.title}</h3>
             <p style={{ color: 'var(--text-secondary)' }}>{comm.description}</p>
             <button 
-              onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+              onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
               style={{ 
                 marginTop: '1.5rem', 
                 backgroundColor: 'transparent', 

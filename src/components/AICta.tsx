@@ -26,7 +26,7 @@ const AICta = () => {
         </p>
 
         <button 
-          onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+          onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
           style={{ 
             backgroundColor: '#65628C',
             color: 'var(--white)',

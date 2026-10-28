@@ -10,7 +10,7 @@ const ValueProp = () => {
           Una comunidad de abogados para abogados donde puedes compartir tu conocimiento y experiencias y aprender junto a colegas de tu área.
         </p>
         <button 
-          onClick={() => window.location.href = 'https://forms.gle/EgnBCy7TNZ3rSksdA'}
+          onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
           className="value-prop-btn"
         >
           Únete a Almah
