@@ -204,6 +204,26 @@ body {
   gap: 2rem;
 }
 
+.navbar-login-btn {
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-weight: 700;
+  font-size: var(--font-size-nav);
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-family: inherit;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.navbar-login-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
 .navbar-hamburger-btn {
   display: none;
   background: transparent !important;
@@ -303,8 +323,19 @@ body {
     font-size: 15px;
     font-weight: 700;
     color: #65628c;
+    background: transparent;
+    border: none;
     text-decoration: none;
     padding: 0.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+    transition: opacity 0.2s ease;
+  }
+
+  .navbar-mobile-login:hover {
+    opacity: 0.8;
   }
 }
 
@@ -844,4 +875,311 @@ body {
   .contact-form-carousel-col {
     width: 100%;
   }
+}
+
+/* ==========================================================================
+   Login Instance Selection Modal
+   ========================================================================== */
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 29, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: loginFadeIn 0.22s ease-out forwards;
+}
+
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.login-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 660px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 2.25rem 2.25rem 2rem;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  animation: loginCardPop 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes loginCardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.login-modal-close-btn {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+  padding: 0;
+  z-index: 2;
+}
+
+.login-modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
+}
+
+.login-modal-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+  padding: 0 1rem;
+}
+
+.login-modal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5B21B6;
+  background: #F3F0FF;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.login-modal-tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00DC94;
+}
+
+.login-modal-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.login-modal-subtitle {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.login-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 640px) {
+  .login-modal-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .login-modal-card {
+    padding: 1.75rem 1.25rem 1.5rem;
+    border-radius: 20px;
+  }
+  .login-modal-title {
+    font-size: 22px;
+  }
+}
+
+.login-instance-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  background: #fafafa;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 1.5rem 1.25rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  color: inherit;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.login-instance-card:hover {
+  transform: translateY(-4px);
+  background: #ffffff;
+}
+
+.login-instance-card.hub-card:hover {
+  border-color: #8F7FEE;
+  box-shadow: 0 16px 32px -8px rgba(143, 127, 238, 0.25);
+}
+
+.login-instance-card.fintech-card:hover {
+  border-color: #00DC94;
+  box-shadow: 0 16px 32px -8px rgba(0, 220, 148, 0.25);
+}
+
+.login-instance-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.login-instance-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.login-instance-tag {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.hub-card .login-instance-tag {
+  background: #F3F0FF;
+  color: #6D5ED2;
+}
+
+.fintech-card .login-instance-tag {
+  background: #ECFDF5;
+  color: #047857;
+}
+
+.login-instance-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.5rem;
+}
+
+.login-instance-domain-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-bottom: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.login-instance-domain-pill svg {
+  flex-shrink: 0;
+  color: #9ca3af;
+}
+
+.hub-card:hover .login-instance-domain-pill {
+  border-color: #D8B4FE;
+  background: #FAF5FF;
+  color: #581C87;
+}
+
+.fintech-card:hover .login-instance-domain-pill {
+  border-color: #A7F3D0;
+  background: #F0FDF4;
+  color: #065F46;
+}
+
+.login-instance-desc {
+  font-size: 13.5px;
+  color: #6b7280;
+  line-height: 1.45;
+  margin: 0 0 1.25rem;
+  flex-grow: 1;
+}
+
+.login-instance-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.login-instance-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.login-instance-card:hover .login-instance-btn svg {
+  transform: translateX(4px);
+}
+
+.hub-card .login-instance-btn {
+  background: rgba(143, 127, 238, 0.12);
+  color: #5B21B6;
+}
+
+.hub-card:hover .login-instance-btn {
+  background: #8F7FEE;
+  color: #ffffff;
+}
+
+.fintech-card .login-instance-btn {
+  background: rgba(0, 220, 148, 0.14);
+  color: #035135;
+}
+
+.fintech-card:hover .login-instance-btn {
+  background: #00DC94;
+  color: #035135;
+}
+
+.login-modal-footer {
+  text-align: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1.25rem;
+  font-size: 13.5px;
+  color: #64748b;
+}
+
+.login-modal-footer a {
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.login-modal-footer a:hover {
+  color: #00DC94;
 }

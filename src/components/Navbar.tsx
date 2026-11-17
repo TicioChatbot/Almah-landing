@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo-high.png';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const closeMenu = () => setIsOpen(false);
 
@@ -28,7 +30,13 @@ const Navbar = () => {
 
         {/* Auth Actions Desktop */}
         <div className="navbar-actions-desktop">
-          <a href="https://fintech.almah.ai" style={{ color: 'var(--white)', fontWeight: 700, textDecoration: 'none', fontSize: 'var(--font-size-nav)' }}>Iniciar sesión</a>
+          <button 
+            type="button"
+            onClick={() => setIsLoginModalOpen(true)}
+            className="navbar-login-btn"
+          >
+            Iniciar sesión
+          </button>
           
           <button 
             onClick={() => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScwqKR1CqKrJdhyJDGw7Phs3oVQMHyz61BOI591WnNDGWguSw/viewform?usp=header'}
@@ -85,13 +93,16 @@ const Navbar = () => {
           </nav>
           
           <div className="navbar-mobile-cta">
-            <a 
-              href="https://fintech.almah.ai" 
-              onClick={closeMenu}
+            <button 
+              type="button"
+              onClick={() => {
+                closeMenu();
+                setIsLoginModalOpen(true);
+              }}
               className="navbar-mobile-login"
             >
               Iniciar sesión
-            </a>
+            </button>
             <button 
               onClick={() => {
                 closeMenu();
@@ -112,6 +123,12 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* Instance Choice Login Modal */}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </header>
   );
 };
